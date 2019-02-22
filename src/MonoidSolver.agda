@@ -75,6 +75,7 @@ mutual
 
   E′ : Term → Term
   E′ (def (quote Monoid._∙_) xs) = E₂ xs
+  E′ (def (quote Monoid.ε) _) = quote E ⟨ con ⟩ []
   E′ t = quote K ⟨ con ⟩ (t ⟨∷⟩ [])
 
 getVisible : Arg Term → Maybe Term
