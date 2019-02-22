@@ -11,6 +11,8 @@ open Monoid ℳ renaming (Carrier to 𝓡)
 open import Data.Product
 open import Function
 open import Level using (_⊔_)
+open import Data.Nat as ℕ using (ℕ; suc; zero)
+open import Data.List as List using (List; _∷_; [])
 
 open import MonoidSolver ℳ using (solve-macro)
 open import Data.Unit using (⊤)
@@ -24,6 +26,9 @@ record σ {a} (Σ : Set a) : Set (a ⊔ c) where field μ : Σ → 𝓡
 open σ ⦃ ... ⦄ public
 {-# DISPLAY σ.μ _ x = μ x #-}
 
+instance
+  σ-List : ∀ {a} {Σ : Set a} → ⦃ _ : σ Σ ⦄ → σ (List Σ)
+  μ ⦃ σ-List ⦄ = List.foldr (_∙_ ∘ μ) ε
 
 record ⟪_⟫ {a} (Σ : Set a) ⦃ _ : σ Σ ⦄ : Set (a ⊔ c ⊔ ℓ) where
   constructor μ⟨_⟩≈_⟨_⟩
@@ -106,9 +111,12 @@ infixr 2 ∙≫_ ≪∙_
 ≪∙_ : ∀ {x y z} → x ≈ y → x ∙ z ≈ y ∙ z
 ≪∙_ = flip ∙-cong refl
 
+trans⁻¹ : ∀ {x y z : 𝓡} → y ≈ z → x ≈ y → x ≈ z
+trans⁻¹ = flip trans
+
 _◂_ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (x : Σ) → (xs : Tree Σ) → Σ[ ys ∈ Tree Σ ] (μ x ∙ μ xs ≈ μ ys)
 a ◂ empty = single a , identityʳ _
-a ◂ single b = deep ⟅ D₁ a & empty & D₁ b ⟆ , (∙≫ sym (identityˡ _))
+a ◂ single b = deep ⟅ D₁ a & empty & D₁ b ⟆ , ℳ !
 a ◂ deep μ⟨ D₁ b & m & xs ⟩≈ μ⟨𝓢⟩ ⟨ ⟪≈⟫ ⟩ = deep μ⟨ D₂ a b & m & xs ⟩≈ μ a ∙ μ⟨𝓢⟩ ⟨ assoc _ _ _ ⟨ trans ⟩ ∙≫ ⟪≈⟫ ⟩ , refl
 a ◂ deep μ⟨ D₂ b c & m & xs ⟩≈ μ⟨𝓢⟩ ⟨ ⟪≈⟫ ⟩ = deep μ⟨ D₃ a b c & m & xs ⟩≈ μ a ∙ μ⟨𝓢⟩ ⟨ assoc _ _ _ ⟨ trans ⟩ ∙≫ ⟪≈⟫ ⟩ , refl
 a ◂ deep μ⟨ D₃ b c d & m & xs ⟩≈ μ⟨𝓢⟩ ⟨ ⟪≈⟫ ⟩ = deep μ⟨ D₄ a b c d & m & xs ⟩≈ μ a ∙ μ⟨𝓢⟩ ⟨ assoc _ _ _ ⟨ trans ⟩ ∙≫ ⟪≈⟫ ⟩ , refl
@@ -125,9 +133,6 @@ a ◂ deep μ⟨ D₄ b c d e & m & xs ⟩≈ μ⟨𝓢⟩ ⟨ ⟪≈⟫ ⟩ wit
     ≈⟨ ⟪≈⟫ ⟩
       μ⟨𝓢⟩
     ∎
-
-trans⁻¹ : ∀ {x y z : 𝓡} → y ≈ z → x ≈ y → x ≈ z
-trans⁻¹ = flip trans
 
 _▸_ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Tree Σ) → (x : Σ) → Σ[ ys ∈ Tree Σ ] (μ xs ∙ μ x ≈ μ ys)
 empty ▸ a = single a , ℳ !
@@ -150,4 +155,41 @@ deep μ⟨ xs & m & D₄ a b c d ⟩≈ μ⟨𝓢⟩ ⟨ ⟪≈⟫ ⟩ ▸ e wit
     ≈⟨ ≪∙ ⟪≈⟫ ⟩
       μ⟨𝓢⟩ ∙ μ e
     ∎
+
+open import Relation.Unary
+open import Relation.Nullary
+open import Relation.Binary hiding (Decidable)
+
+module Splitting
+  {s}
+  {ℙ : Pred 𝓡 s}
+  (ℙ-resp : ℙ Respects _≈_)
+  (ℙ? : Decidable ℙ)
+  (mono-ℙ : ∀ x y → ℙ x → ℙ (x ∙ y))
+  where
+  open import Data.Empty using (⊥-elim)
+
+  mono-¬ℙ : ∀ x y → ¬ ℙ (x ∙ y) → ¬ ℙ x
+  mono-¬ℙ x y ¬ℙ⟨x∙y⟩ ℙ⟨x⟩ = ¬ℙ⟨x∙y⟩ (mono-ℙ x y ℙ⟨x⟩)
+
+  ∃¬ℙ⇒¬ℙ⟨ε⟩ : ∃[ x ] (¬ ℙ x) → ¬ ℙ ε
+  ∃¬ℙ⇒¬ℙ⟨ε⟩ (x , ¬ℙ⟨x⟩) ℙ⟨ε⟩ = ¬ℙ⟨x⟩ (ℙ-resp (identityˡ _) (mono-ℙ ε x ℙ⟨ε⟩))
+
+  record Split {a b} (Σ : Set a) (A : Set b) ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ : Set (s ⊔ a ⊔ b) where
+    constructor _∷⟨_⟩∷_
+    field
+      ¬ℙ : Σ[ xs ∈ Σ ] ¬ ℙ (μ xs)
+      !ℙ : Σ[ x  ∈ A ] ℙ (μ x)
+      ?ℙ : Σ
+  open Split
+
+  instance
+    σ-Split : ∀ {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ → σ (Split Σ A)
+    μ ⦃ σ-Split ⦄ ((l , _) ∷⟨ x , _ ⟩∷ r) = μ l ∙ (μ x ∙ μ r)
+
+  -- splitNode : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → ∃[ x ] (¬ ℙ x) → (xs : Node Σ) → ℙ (μ xs) → Σ[ ys ∈ Split (List Σ) Σ ] (μ xs ≈ μ ys)
+  -- splitNode (x₁ , ¬ℙx) (N₂ x₂ x₃) ℙ⟨xs⟩ with ℙ? (x₁ ∙ μ x₂)
+  -- splitNode i (N₂ x₂ x₃) ℙ⟨xs⟩ | yes p = (([] , ∃¬ℙ⇒¬ℙ⟨ε⟩ i) ∷⟨ x₂ , {!!} ⟩∷ (x₃ ∷ [])) , ℳ !
+  -- splitNode (x₁ , ¬ℙx) (N₂ x₂ x₃) ℙ⟨xs⟩ | no ¬p = ((x₂ ∷ [] , {!!} ∘ ℙ-resp (identityʳ _)) ∷⟨ x₃ , {!!} ⟩∷ []) , ℳ !
+  -- splitNode (x₁ , ¬ℙx) (N₃ x₂ x₃ x₄) ℙ⟨xs⟩ = {!!}
 
