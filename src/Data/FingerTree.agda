@@ -4,18 +4,26 @@ open import Algebra
 
 module Data.FingerTree
   {c ℓ}
-  (meas : Monoid c ℓ)
+  (ℳ : Monoid c ℓ)
   where
 
-open Monoid meas renaming (Carrier to 𝓡)
-
+open Monoid ℳ renaming (Carrier to 𝓡)
 open import Data.Product
 open import Function
 open import Level using (_⊔_)
 
+open import MonoidSolver ℳ using (solve-macro)
+open import Data.Unit using (⊤)
+open import Reflection using (TC; Term)
+
+macro
+  _! : Term → Term → TC ⊤
+  _! = solve-macro
+
 record σ {a} (Σ : Set a) : Set (a ⊔ c) where field μ : Σ → 𝓡
 open σ ⦃ ... ⦄ public
 {-# DISPLAY σ.μ _ x = μ x #-}
+
 
 record ⟪_⟫ {a} (Σ : Set a) ⦃ _ : σ Σ ⦄ : Set (a ⊔ c ⊔ ℓ) where
   constructor μ⟨_⟩≈_⟨_⟩
@@ -89,7 +97,7 @@ open Deep
 {-# DISPLAY μ-tree _ x = μ x #-}
 {-# DISPLAY μ-deep _ x = μ x #-}
 
-open import Relation.Binary.Reasoning.Setoid setoid
+open import FasterReasoning setoid
 
 infixr 2 ∙≫_ ≪∙_
 ∙≫_ : ∀ {x y z} → x ≈ y → z ∙ x ≈ z ∙ y
