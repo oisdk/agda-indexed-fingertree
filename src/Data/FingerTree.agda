@@ -101,7 +101,7 @@ a ◂ deep (v , ⟅ D₁ b & m & xs , p ⟆) = ⟅ deep ((μ a ∙ v) , ⟅ D₂
 a ◂ deep (v , ⟅ D₂ b c & m & xs , p ⟆) = ⟅ deep ((μ a ∙ v) , ⟅ D₃ a b c & m & xs , ∙≫ p ⟨ trans ⟩ sym (assoc _ _ _) ⟆) , refl ⟆
 a ◂ deep (v , ⟅ D₃ b c d & m & xs , p ⟆) = ⟅ deep ((μ a ∙ v) , ⟅ D₄ a b c d & m & xs , ∙≫ p ⟨ trans ⟩ sym (assoc _ _ _) ⟆) , refl ⟆
 a ◂ deep (v , ⟅ D₄ b c d e & m & xs , p ⟆) with (μ c ∙ (μ d ∙ μ e) ,  ⟅ N₃ c d e , refl ⟆) ◂ m
-... | ⟅ m′ , p′ ⟆ = ⟅ deep ((μ a ∙ μ b) ∙ (μ m′ ∙ μ xs) , ⟅ D₂ a b & m′ & xs , refl ⟆) , lemma ⟆
+... | ⟅ m′ , p′ ⟆ = ⟅ deep ((μ a ∙ v) , ⟅ D₂ a b & m′ & xs , lemma ⟆) , refl ⟆
   where
   lemma =
     begin
