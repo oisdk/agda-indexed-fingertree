@@ -14,6 +14,7 @@ open import Data.FingerTree.Structures ℳ
 open import Data.FingerTree.Reasoning ℳ
 
 open σ ⦃ ... ⦄
+{-# DISPLAY σ.μ _ x = μ x #-}
 
 open Monoid ℳ
 
@@ -39,6 +40,13 @@ a ◂ deep (μ⟨𝓢⟩ , D₄ b c d e & m & rs ↦ μ⟨xs⟩≈μ⟨𝓢⟩) 
     ≈⟨ μ⟨xs⟩≈μ⟨𝓢⟩ ⟩
       μ⟨𝓢⟩
       ∎
+
+open import Data.List as List using (List; _∷_; [])
+
+listToTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : List Σ) → ⟨ Tree Σ ⟩μ⁻¹ (μ xs)
+listToTree [] = empty ↦ refl
+listToTree (x ∷ xs) with listToTree xs
+listToTree (x ∷ xs) | ys ↦ fib = (x ◂ ys) ≈[ ∙≫ fib ]
 
 _▸_ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Tree Σ) → (x : Σ) → ⟨ Tree Σ ⟩μ⁻¹ (μ xs ∙ μ x)
 empty ▸ a = single a ↦ ℳ ↯
