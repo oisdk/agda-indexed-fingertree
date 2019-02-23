@@ -119,3 +119,4 @@ solve-macro mon hole = do
     where nothing → typeError (termErr hole′ ∷ [])
   let soln = constructSoln mon lhs rhs
   unify hole soln ⟨ catchTC ⟩ typeError (termErr soln ∷ termErr lhs ∷ termErr rhs ∷ [])
+
