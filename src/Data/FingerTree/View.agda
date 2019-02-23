@@ -11,9 +11,12 @@ open import Level using (_⊔_)
 open import Data.Product
 open import Function
 
+open import Data.List as List using (List; _∷_; [])
+
 open import Data.FingerTree.Structures ℳ
 open import Data.FingerTree.Reasoning ℳ
 open import Data.FingerTree.Measures ℳ
+open import Data.FingerTree.Cons ℳ
 open σ ⦃ ... ⦄
 {-# DISPLAY σ.μ _ = μ #-}
 {-# DISPLAY μ-tree _ x = μ x #-}
@@ -64,3 +67,25 @@ viewᵣ (deep (μ⟨xs⟩ , (ls & m & D₁ a) ↦ μ⟨xs⟩≈)) with viewᵣ m
 ... | ys ▹ (μ⟨y⟩ , N₃ y₁ y₂ y₃ ↦ yp) ↦ p = deep (μ ls ∙ μ m , ls & ys & D₃ y₁ y₂ y₃ ↦ (ℳ ↯ ⍮ ∙≫ (∙≫ yp ⍮ p))) ▹ a ↦ (assoc _ _ _ ⍮ μ⟨xs⟩≈)
 ... | nilᵣ ↦ p with digitToTree ls
 ... | ls′ ↦ p′ = ls′ ▹ a ↦ (∙-cong p′ (sym (identityˡ _) ⍮ ≪∙ p) ⍮ μ⟨xs⟩≈)
+
+deepₗ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (l : List Σ) → (m : Tree ⟪ Node Σ ⟫) → (r : Digit Σ) → ⟨ Tree Σ ⟩μ⁻¹ (μ l ∙ (μ m ∙ μ r))
+deepₗ [] m r with viewₗ m
+deepₗ [] m r | nilₗ ↦ p = digitToTree r ≈[ sym (identityˡ _) ⍮ ≪∙ p ⍮ sym (identityˡ _) ]
+deepₗ [] m r | (μ⟨y⟩ , y ↦ μ⟨y⟩≈) ◃ ys ↦ p with nodeToDigit y
+deepₗ [] m r | (μ⟨y⟩ , y ↦ μ⟨y⟩≈) ◃ ys ↦ p | (y′ ↦ μ⟨y′⟩≈) = deep (μ m ∙ μ r , y′ & ys & r ↦ (sym (assoc _ _ _) ⍮ ≪∙ (≪∙ (μ⟨y′⟩≈ ⍮ μ⟨y⟩≈) ⍮ p))) ↦ sym (identityˡ _)
+deepₗ (l ∷ ls) m r = go l ls m r
+  where
+  go : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (l : Σ) → (ls : List Σ) → (m : Tree ⟪ Node Σ ⟫) → (r : Digit Σ) → ⟨ Tree Σ ⟩μ⁻¹ (μ l ∙ μ ls ∙ (μ m ∙ μ r))
+  go l [] m r = deep (_ , D₁ l & m & r ↦ refl) ↦ ℳ ↯
+  go l₁ (l₂ ∷ ls) m r = l₁ ◂′ go l₂ ls m r ≈[ ℳ ↯ ]
+
+deepᵣ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (l : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (r : List Σ) → ⟨ Tree Σ ⟩μ⁻¹ (μ l ∙ (μ m ∙ μ r))
+deepᵣ l m [] with viewᵣ m
+deepᵣ l m [] | nilᵣ ↦ p = digitToTree l ≈[ sym (identityʳ _) ⍮ ∙≫ (p ⍮ sym (identityʳ _)) ]
+deepᵣ l m [] | ys ▹ (μ⟨y⟩ , y ↦ μ⟨y⟩≈) ↦ p with nodeToDigit y
+deepᵣ l m [] | ys ▹ (μ⟨y⟩ , y ↦ μ⟨y⟩≈) ↦ p | (y′ ↦ μ⟨y′⟩≈) = deep (μ l ∙ μ m , l & ys & y′ ↦ (∙≫ (∙≫ (μ⟨y′⟩≈ ⍮ μ⟨y⟩≈) ⍮ p))) ↦ ℳ ↯
+deepᵣ l m (r ∷ rs) = go μ[ deep (_ , l & m & D₁ r ↦ refl) ] rs ≈[ ℳ ↯ ]
+  where
+  go : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → ∀ {xs} → ⟨ Tree Σ ⟩μ⁻¹ xs → (rs : List Σ) → ⟨ Tree Σ ⟩μ⁻¹ (xs ∙ μ rs)
+  go xs [] = xs ≈[ sym (identityʳ _) ]
+  go xs (r ∷ rs) = go (xs ▸′ r) rs ≈[ ℳ ↯ ]

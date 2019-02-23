@@ -23,6 +23,7 @@ open import Data.List as List using (List; _∷_; [])
 open import Data.FingerTree.Measures ℳ
 open import Data.FingerTree.Structures ℳ
 open import Data.FingerTree.Reasoning ℳ
+open import Data.FingerTree.View ℳ using (deepₗ; deepᵣ)
 open import Data.FingerTree.Cons ℳ using (listToTree)
 
 open σ ⦃ ... ⦄
@@ -104,11 +105,6 @@ module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
   splitDigit i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ with splitList i ¬ℙ⟨i⟩ ys (ℙ-resp (∙≫ sym μ⟨ys⟩≈μ⟨xs⟩) ℙ⟨i∙xs⟩)
   splitDigit i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ | zs ↦ i∙μ⟨zs⟩≈i∙μ⟨ys⟩ = zs ↦ (i∙μ⟨zs⟩≈i∙μ⟨ys⟩ ⍮ ∙≫ μ⟨ys⟩≈μ⟨xs⟩)
 
-  deepₗ : (l : List Σ) → (m : Tree ⟪ Node Σ ⟫) → (r : Digit Σ) → ⟨ Tree Σ ⟩μ⁻¹ (μ l ∙ (μ m ∙ μ r))
-  deepₗ = {!!}
-
-  deepᵣ : (l : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (r : List Σ) → ⟨ Tree Σ ⟩μ⁻¹ (μ l ∙ (μ m ∙ μ r))
-  deepᵣ = {!!}
 
   splitTree-l : ∀ i → ¬ ℙ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫)  → (rs : Digit Σ) → ℙ (i ∙ μ ls) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
   splitTree-l i ¬ℙ⟨i⟩ ls m rs ℙ⟨i∙ls⟩ with splitDigit i ¬ℙ⟨i⟩ ls ℙ⟨i∙ls⟩
@@ -130,13 +126,57 @@ module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
         i ∙ (μ ls ∙ (μ m ∙ μ rs))
       ∎
 
+  splitTree-r : ∀ i → ¬ ℙ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫)  → (rs : Digit Σ) → ℙ (i ∙ (μ ls ∙ (μ m ∙ μ rs))) → ∀ i′ → i′ ≈ i ∙(μ ls ∙ μ m) → ¬ ℙ (i ∙ (μ ls ∙ μ m)) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
+  splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ with splitDigit i′ (¬ℙ⟨i∙ls∙m⟩ ∘′ ℙ-resp ⟪i′⟫) rs (ℙ-resp (ℳ ↯ ⍮′ ≪∙ sym ⟪i′⟫) ℙ⟨xs⟩)
+  splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p₁ , p₂ ] ↦ p₃ with deepᵣ ls m lsᵣ | listToTree rsᵣ
+  splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p₁ , p₂ ] ↦ p₃ | ls′ ↦ ls′≈ | rs′ ↦ rs′≈ = ls′ ∷⟨ mᵣ ⟩∷ rs′ [ p₁ ∘′ ℙ-resp lemma₁ , ℙ-resp lemma₂ p₂ ] ↦ lemma₃
+    where
+    lemma₁ =
+      begin
+        i ∙ μ ls′
+      ≈⟨ ∙≫ ls′≈ ⟩
+        i ∙ (μ ls ∙ (μ m ∙ μ lsᵣ))
+      ≈⟨ ℳ ↯ ⟩
+        (i ∙ (μ ls ∙ μ m)) ∙ μ lsᵣ
+      ≈˘⟨ ≪∙ ⟪i′⟫ ⟩
+        i′ ∙ μ lsᵣ
+      ∎
+    lemma₂ =
+      begin
+        i′ ∙ (μ lsᵣ ∙ μ mᵣ)
+      ≈⟨ ≪∙ ⟪i′⟫ ⟩
+        (i ∙ (μ ls ∙ μ m)) ∙ (μ lsᵣ ∙ μ mᵣ)
+      ≈⟨ ℳ ↯ ⟩
+        i ∙ ((μ ls ∙ (μ m ∙ μ lsᵣ)) ∙ μ mᵣ)
+      ≈˘⟨ ∙≫ ≪∙ ls′≈ ⟩
+        i ∙ (μ ls′ ∙ μ mᵣ)
+      ∎
+    lemma₃ =
+      begin
+        i ∙ (μ ls′ ∙ (μ mᵣ ∙ μ rs′))
+      ≈⟨ ∙≫ ∙-cong ls′≈ (∙≫ rs′≈) ⟩
+        i ∙ ((μ ls ∙ (μ m ∙ μ lsᵣ)) ∙ (μ mᵣ ∙ μ rsᵣ))
+      ≈⟨ ℳ ↯ ⟩
+        (i ∙ (μ ls ∙ μ m)) ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ))
+      ≈˘⟨ ≪∙ ⟪i′⟫ ⟩
+        i′ ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ))
+      ≈⟨ p₃ ⟩
+        i′ ∙ μ rs
+      ≈⟨ ≪∙ ⟪i′⟫ ⟩
+        (i ∙ (μ ls ∙ μ m)) ∙ μ rs
+      ≈⟨ ℳ ↯ ⟩
+        i ∙ (μ ls ∙ (μ m ∙ μ rs))
+      ∎
+
+
+
 splitTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → ∀ i → ¬ ℙ i → (xs : Tree Σ) → ℙ (i ∙ μ xs) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹ (i ∙ μ xs)
 splitTree i ¬ℙ⟨i⟩ empty ℙ⟨i∙xs⟩ = ⊥-elim (¬ℙ⟨i⟩ (ℙ-resp (identityʳ _) ℙ⟨i∙xs⟩))
 splitTree i ¬ℙ⟨i⟩ (single x) ℙ⟨i∙xs⟩ = empty ∷⟨ x ⟩∷ empty [ ¬ℙ⟨i⟩ ∘ ℙ-resp (identityʳ _) , ℙ⟨i∙xs⟩ ⇒ i ∙ (ε ∙ μ x) ⟨ ℳ ↯ ⟩ ] ↦ ℳ ↯
 splitTree i ¬ℙ⟨i⟩ (deep (μ⟨xs⟩ , ls & m & rs ↦ μ⟨xs⟩≈)) ℙ⟨i∙xs⟩ with ⟪ℙ? (i ∙ μ ls) ⇓⟫
 ... | ⟪ i′ ⟨ ⟪i′⟫ ⟩ yes p ?⟫ = splitTree-l i ¬ℙ⟨i⟩ ls m rs p ≈[ ∙≫ μ⟨xs⟩≈ ]
 ... | ⟪ i′ ⟨ ⟪i′⟫ ⟩ no ¬p ?⟫ with ⟪ℙ? (i′ ∙ μ m) ⇓⟫
-... | ⟪ i″ ⟨ ⟪i″⟫ ⟩ no ¬p′ ?⟫ = {!!}
+... | ⟪ i″ ⟨ ⟪i″⟫ ⟩ no ¬p′ ?⟫ = splitTree-r i ¬ℙ⟨i⟩ ls m rs (ℙ-resp (∙≫ sym (μ⟨xs⟩≈)) ℙ⟨i∙xs⟩) i″ (sym ⟪i″⟫ ⍮ (≪∙ sym ⟪i′⟫ ⍮ assoc _ _ _)) (¬p′ ∘′ ℙ-resp (sym (assoc _ _ _) ⍮ ≪∙ ⟪i′⟫)) ≈[ ∙≫ μ⟨xs⟩≈ ]
 ... | ⟪ i″ ⟨ ⟪i″⟫ ⟩ yes p′ ?⟫ with splitTree i′ (¬p ∘′ ℙ-resp (sym ⟪i′⟫)) m p′
 ... | lsₘ ∷⟨ μ⟨mₘ⟩ , mₘ ↦ mₘ≈ ⟩∷ rsₘ [ p₁ , p₂ ] ↦ p₃ with splitNode (i′ ∙ μ lsₘ) p₁ mₘ (ℙ-resp (sym (assoc _ _ _) ⍮ ∙≫ sym mₘ≈) p₂)
 ... | l ∷⟨ x ⟩∷ r [ p₄ , p₅ ] ↦ p₆ with deepᵣ ls lsₘ l | deepₗ r rsₘ rs
