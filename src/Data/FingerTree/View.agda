@@ -31,7 +31,7 @@ instance
   μ ⦃ σ-Viewₗ ⦄ nilₗ = ε
   μ ⦃ σ-Viewₗ ⦄ (x ◃ xs) = μ x ∙ μ xs
 
-viewₗ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Tree Σ) → ⟨ Viewₗ Σ (Tree Σ) ⟩μ⁻¹[ μ xs ]
+viewₗ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Tree Σ) → ⟨ Viewₗ Σ (Tree Σ) ⟩μ⁻¹ (μ xs)
 viewₗ empty = nilₗ ↦ refl
 viewₗ (single x) = x ◃ empty ↦ identityʳ _
 viewₗ (deep (μ⟨xs⟩ , (D₂ a b     & m & rs) ↦ μ⟨xs⟩≈)) = a ◃ deep (_ , D₁ b     & m & rs ↦ refl) ↦ (ℳ ↯ ⍮′ μ⟨xs⟩≈)
@@ -53,7 +53,7 @@ instance
   μ ⦃ σ-Viewᵣ ⦄ nilᵣ = ε
   μ ⦃ σ-Viewᵣ ⦄ (xs ▹ x) = μ xs ∙ μ x
 
-viewᵣ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Tree Σ) → ⟨ Viewᵣ Σ (Tree Σ) ⟩μ⁻¹[ μ xs ]
+viewᵣ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Tree Σ) → ⟨ Viewᵣ Σ (Tree Σ) ⟩μ⁻¹ (μ xs)
 viewᵣ empty = nilᵣ ↦ refl
 viewᵣ (single x) = empty ▹ x ↦ identityˡ _
 viewᵣ (deep (μ⟨xs⟩ , (ls & m & D₂ a b    ) ↦ μ⟨xs⟩≈)) = (deep (_ , ls & m & D₁ a     ↦ refl) ▹ b) ↦ (μ (ls & m & D₁ a) ∙ μ b ↢ ℳ ↯ ⍮′ μ⟨xs⟩≈)
