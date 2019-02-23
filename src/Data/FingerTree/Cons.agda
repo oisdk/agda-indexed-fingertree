@@ -13,7 +13,12 @@ open import Data.FingerTree.Measures ℳ
 open import Data.FingerTree.Structures ℳ
 open import Data.FingerTree.Reasoning ℳ
 
+open σ ⦃ ... ⦄
+
 open Monoid ℳ
+
+infixr 5 _◂_
+infixl 5 _▸_
 
 _◂_ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (x : Σ) → (xs : Tree Σ) → ⟨ Tree Σ ⟩μ⁻¹[ μ x ∙ μ xs ]
 a ◂ empty = single a ↦ ℳ ↯
@@ -33,7 +38,7 @@ a ◂ deep (μ⟨𝓢⟩ , D₄ b c d e & m & rs ↦ μ⟨xs⟩≈μ⟨𝓢⟩) 
       μ b ∙ (μ c ∙ (μ d ∙ μ e)) ∙ (μ m ∙ μ rs)
     ≈⟨ μ⟨xs⟩≈μ⟨𝓢⟩ ⟩
       μ⟨𝓢⟩
-    ∎
+      ∎
 
 _▸_ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Tree Σ) → (x : Σ) → ⟨ Tree Σ ⟩μ⁻¹[ μ xs ∙ μ x ]
 empty ▸ a = single a ↦ ℳ ↯

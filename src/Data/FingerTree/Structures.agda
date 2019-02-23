@@ -10,8 +10,13 @@ module Data.FingerTree.Structures
 open import Level using (_⊔_)
 open import Data.Product
 
-open Monoid ℳ renaming (Carrier to 𝓡)
+
 open import Data.FingerTree.Measures ℳ
+open import Data.FingerTree.Reasoning ℳ
+
+open Monoid ℳ renaming (Carrier to 𝓡)
+open σ ⦃ ... ⦄
+{-# DISPLAY σ.μ _ = μ #-}
 
 
 data Digit {a} (Σ : Set a) : Set a where
@@ -70,3 +75,13 @@ open Deep
 
 {-# DISPLAY μ-tree _ x = μ x #-}
 {-# DISPLAY μ-deep _ x = μ x #-}
+
+nodeToDigit : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Node Σ) → ⟨ Digit Σ ⟩μ⁻¹[ μ xs ]
+nodeToDigit (N₂ x₁ x₂) = D₂ x₁ x₂ ↦ refl
+nodeToDigit (N₃ x₁ x₂ x₃) = D₃ x₁ x₂ x₃ ↦ refl
+
+digitToTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Digit Σ) → ⟨ Tree Σ ⟩μ⁻¹[ μ xs ]
+digitToTree (D₁ x₁) = single x₁ ↦ refl
+digitToTree (D₂ x₁ x₂) = deep ⟅ D₁ x₁ & empty & D₁ x₂ ⟆ ↦ ℳ ↯
+digitToTree (D₃ x₁ x₂ x₃) = deep ⟅ D₂ x₁ x₂ & empty & D₁ x₃ ⟆ ↦ ℳ ↯
+digitToTree (D₄ x₁ x₂ x₃ x₄) = deep ⟅ D₂ x₁ x₂ & empty & D₂ x₃ x₄ ⟆ ↦ ℳ ↯

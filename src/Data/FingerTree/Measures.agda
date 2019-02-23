@@ -14,8 +14,8 @@ open import Data.List as List using (List; _∷_; [])
 open import Data.Product
 
 record σ {a} (Σ : Set a) : Set (a ⊔ r) where field μ : Σ → 𝓡
-open σ ⦃ ... ⦄ public
-{-# DISPLAY σ.μ _ x = μ x #-}
+open σ ⦃ ... ⦄
+{-# DISPLAY σ.μ _ = μ #-}
 
 -- This is of course just a foldr, but written explicitly like
 -- this gives better type names

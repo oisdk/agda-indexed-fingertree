@@ -35,3 +35,17 @@ trans⁻¹ : ∀ {x y z : 𝓡} → y ≈ z → x ≈ y → x ≈ z
 trans⁻¹ x y = trans y x
 
 syntax trans⁻¹ y≈z x≈y = x≈y ⍮′ y≈z
+
+infixr 2 _↢_ ↣-syntax ↣↣-syntax
+_↢_ : ∀ x {y} → x ≈ y → x ≈ y
+_ ↢ x≈y = x≈y
+
+↣-syntax : ∀ {x} y → x ≈ y → x ≈ y
+↣-syntax _ x≈y = x≈y
+
+syntax ↣-syntax y x≈y = x≈y ↣ y
+
+↣↣-syntax : ∀ x y → x ≈ y → x ≈ y
+↣↣-syntax _ _ x≈y = x≈y
+
+syntax ↣↣-syntax x y x≈y = x ↣⟨ x≈y ⟩↣ y
