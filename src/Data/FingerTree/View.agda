@@ -11,7 +11,6 @@ open import Level using (_⊔_)
 open import Data.Product
 open import Function
 
-
 open import Data.FingerTree.Structures ℳ
 open import Data.FingerTree.Reasoning ℳ
 open import Data.FingerTree.Measures ℳ

@@ -24,6 +24,10 @@ open import Data.FingerTree.Measures ℳ
 open import Data.FingerTree.Structures ℳ
 open import Data.FingerTree.Reasoning ℳ
 
+open σ ⦃ ... ⦄
+
+{-# DISPLAY σ.μ _ = μ #-}
+
 open Monoid ℳ renaming (Carrier to 𝓡)
 
 mono-¬ℙ : ∀ x y → ¬ ℙ (x ∙ y) → ¬ ℙ x
@@ -88,8 +92,15 @@ module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
   splitNode i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ with splitList i ¬ℙ⟨i⟩ ys (ℙ-resp (∙≫ sym μ⟨ys⟩≈μ⟨xs⟩) ℙ⟨i∙xs⟩)
   splitNode i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ | zs ↦ i∙μ⟨zs⟩≈i∙μ⟨ys⟩ = zs ↦ (i∙μ⟨zs⟩≈i∙μ⟨ys⟩ ⍮ ∙≫ μ⟨ys⟩≈μ⟨xs⟩)
 
-
   splitDigit : ∀ i → ¬ ℙ i → (xs : Digit Σ) → ℙ (i ∙ μ xs) → ⟨ Split i (List Σ) Σ ⟩μ⁻¹[ i ∙ μ xs ]
   splitDigit i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ with digitToList xs
   splitDigit i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ with splitList i ¬ℙ⟨i⟩ ys (ℙ-resp (∙≫ sym μ⟨ys⟩≈μ⟨xs⟩) ℙ⟨i∙xs⟩)
   splitDigit i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ | zs ↦ i∙μ⟨zs⟩≈i∙μ⟨ys⟩ = zs ↦ (i∙μ⟨zs⟩≈i∙μ⟨ys⟩ ⍮ ∙≫ μ⟨ys⟩≈μ⟨xs⟩)
+
+  splitTree : ∀ i → ¬ ℙ i → (xs : Tree Σ) → ℙ (i ∙ μ xs) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹[ i ∙ μ xs ]
+  splitTree i ¬ℙ⟨i⟩ empty ℙ⟨i∙xs⟩ = ⊥-elim (¬ℙ⟨i⟩ (ℙ-resp (identityʳ _) ℙ⟨i∙xs⟩))
+  splitTree i ¬ℙ⟨i⟩ (single x) ℙ⟨i∙xs⟩ = empty ∷⟨ x ⟩∷ empty [ ¬ℙ⟨i⟩ ∘ ℙ-resp (identityʳ _) , ℙ⟨i∙xs⟩ ⇒ i ∙ (ε ∙ μ x) ⟨ ℳ ↯ ⟩ ] ↦ ℳ ↯
+  splitTree i ¬ℙ⟨i⟩ (deep (μ⟨xs⟩ , ls & m & rs ↦ μ⟨xs⟩≈)) ℙ⟨i∙xs⟩ with ℙ? (i ∙ μ ls)
+  splitTree i ¬ℙ⟨i⟩ (deep (μ⟨xs⟩ , ls & m & rs ↦ μ⟨xs⟩≈)) ℙ⟨i∙xs⟩ | yes p with splitDigit i ¬ℙ⟨i⟩ ls p
+  splitTree i ¬ℙ⟨i⟩ (deep (μ⟨xs⟩ , ls & m & rs ↦ μ⟨xs⟩≈)) ℙ⟨i∙xs⟩ | yes p | lsₗ ∷⟨ mₗ ⟩∷ rsₗ [ p₁ , p₂ ] ↦ p₃ = {!!} ∷⟨ mₗ ⟩∷ {!!} [ {!!} , {!!} ] ↦ {!!}
+  splitTree i ¬ℙ⟨i⟩ (deep (μ⟨xs⟩ , ls & m & rs ↦ μ⟨xs⟩≈)) ℙ⟨i∙xs⟩ | no ¬p = {!!}
