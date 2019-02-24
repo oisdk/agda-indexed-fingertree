@@ -40,7 +40,7 @@ pure : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ (𝓢 : Σ) → μ⟨ Σ ⟩≈ μ
 𝓢 (pure x) = x
 𝒻 (pure x) = refl
 
-infixl 2 _≈[_] ≈-rev
+infixl 2 _≈[_] ≈-rev _≈˘[_]
 _≈[_] : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ {x : 𝓡} → μ⟨ Σ ⟩≈ x → ∀ {y} → x ≈ y → μ⟨ Σ ⟩≈ y
 x ⇑[ x≈y ] ≈[ y≈z ] = x ⇑[ trans x≈y y≈z ]
 
@@ -48,6 +48,15 @@ x ⇑[ x≈y ] ≈[ y≈z ] = x ⇑[ trans x≈y y≈z ]
 ≈-rev y≈z (x ⇑[ x≈y ]) = x ⇑[ trans x≈y y≈z ]
 
 syntax ≈-rev y≈z x↦y = x↦y ≈[ y≈z ]′
+
+infixr 2 ≈-right
+≈-right : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ {x : 𝓡} → μ⟨ Σ ⟩≈ x → ∀ {y} → x ≈ y → μ⟨ Σ ⟩≈ y
+≈-right (x ⇑[ x≈y ]) y≈z = x ⇑[ trans x≈y y≈z ]
+
+syntax ≈-right x x≈ = [ x≈ ]≈ x
+
+_≈˘[_] : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ {x : 𝓡} → μ⟨ Σ ⟩≈ x → ∀ {y} → y ≈ x → μ⟨ Σ ⟩≈ y
+x ⇑[ x≈y ] ≈˘[ z≈y ] = x ⇑[ trans x≈y (sym z≈y) ]
 
 infixr 1 _↤_
 -- A memoized application of μ
@@ -80,6 +89,7 @@ open import Algebra.FunctionProperties _≈_
 
 -- syntax map-size (λ sz → e₁) fn xs = [ e₁ ⟿ sz ] fn <$> xs
 
+infixl 2 cont-size
 cont-size : {f : 𝓡 → 𝓡}
           → Congruent₁ f
           → ∀ {a b} {Σ₁ : Set a} {Σ₂ : Set b} ⦃ _ : σ Σ₁ ⦄ ⦃ _ : σ Σ₂ ⦄

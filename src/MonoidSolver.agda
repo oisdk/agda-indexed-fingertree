@@ -112,11 +112,13 @@ constructSoln mon lhs rhs =
 _>>=_ : ∀ {a b} {A : Set a} {B : Set b} → TC A → (A → TC B) → TC B
 _>>=_ = bindTC
 
+_>>_ : ∀ {a b} {A : Set a} {B : Set b} → TC A → TC B → TC B
+xs >> ys = xs >>= λ _ → ys
+
 solve-macro : Term → Term → TC ⊤
 solve-macro mon hole = do
   hole′ ← inferType hole >>= normalise
   just (lhs ∷ rhs ∷ []) ← returnTC (getArgs 2 hole′)
     where nothing → typeError (termErr hole′ ∷ [])
   let soln = constructSoln mon lhs rhs
-  unify hole soln ⟨ catchTC ⟩ typeError (termErr soln ∷ termErr lhs ∷ termErr rhs ∷ [])
-
+  unify hole soln
