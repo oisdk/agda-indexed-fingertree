@@ -41,25 +41,8 @@ a ◂ deep (μ⟨𝓢⟩ , D₄ b c d e & m & rs ↦ μ⟨xs⟩≈μ⟨𝓢⟩) 
       μ⟨𝓢⟩
       ∎
 
-open import Function
-
 _◂′_ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (x : Σ) → ∀ {xs} → ⟨ Tree Σ ⟩μ⁻¹ xs → ⟨ Tree Σ ⟩μ⁻¹ (μ x ∙ xs)
-x ◂′ xs = do
-  a ← [ ≪∙_ ] μ[ x ]
-  [ ∙≫_ ] xs >>= λ where
-    empty → μ[ single a ] ≈[ ℳ ↯ ]
-    (single b) → μ[ deep ⟪ D₁ a & empty & D₁ b ⇓⟫ ] ≈[ ℳ ↯ ]
-    (deep ys) → deep (
-      ([ ∙≫_ ] μ[ ys ]) ⟪>>=⟫ λ where
-        (D₁ b & m & rs) → μ[ deep ⟪ D₂ a b & m & rs ⇓⟫  ] ≈[ ℳ ↯ ]
-        (D₂ b c & m & rs) → μ[ deep ⟪ D₃ a b c & m & rs ⇓⟫ ] ≈[ ℳ ↯ ]
-        (D₃ b c d & m & rs) → {!!}
-        (D₄ b c d e & m & rs) → {!!}
-
-
-
-
-
+x ◂′ (xs ↦ p) = (x ◂ xs) ≈[ ∙≫ p ]
 
 open import Data.List as List using (List; _∷_; [])
 
