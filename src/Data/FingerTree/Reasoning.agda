@@ -8,7 +8,6 @@ module Data.FingerTree.Reasoning
   where
 
 open Monoid ℳ renaming (Carrier to 𝓡)
-open import FasterReasoning setoid public
 
 open import MonoidSolver ℳ using (solve-macro)
 
