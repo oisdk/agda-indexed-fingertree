@@ -95,8 +95,8 @@ cont-size : {f : 𝓡 → 𝓡}
           → ∀ {a b} {Σ₁ : Set a} {Σ₂ : Set b} ⦃ _ : σ Σ₁ ⦄ ⦃ _ : σ Σ₂ ⦄
           → {𝓂 : 𝓡}
           → μ⟨ Σ₁ ⟩≈ 𝓂
-          → ((x : Σ₁) → μ⟨ Σ₂ ⟩≈ (f (μ x)))
+          → ((x : Σ₁) → {x≈ : μ x ≈ 𝓂 } → μ⟨ Σ₂ ⟩≈ (f (μ x)))
           → μ⟨ Σ₂ ⟩≈ (f 𝓂)
-cont-size cng (x ⇑[ x≈ ]) f = f x ≈[ cng x≈ ]
+cont-size cng (x ⇑[ x≈ ]) f = f x {x≈} ≈[ cng x≈ ]
 
 syntax cont-size (λ sz → e₁) xs e₂ = xs [ e₁ ⟿ sz ] e₂

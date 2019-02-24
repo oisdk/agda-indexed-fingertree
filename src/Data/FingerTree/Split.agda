@@ -32,71 +32,100 @@ open σ ⦃ ... ⦄
 
 open Monoid ℳ renaming (Carrier to 𝓡)
 
-open import Relation.Binary.Construct.FromPred setoid ℙ as PredRel
-open import Relation.Binary.Reasoning.Preorder (PredRel.preorder ℙ-resp)
+-- open import Relation.Binary.Construct.FromPred setoid ℙ as PredRel
+-- open import Relation.Binary.Reasoning.Preorder (PredRel.preorder ℙ-resp)
 
-infixr 5 _∷⟨_⟩∷_[_,_]
-record Split {a b} (Σ : Set a) (A : Set b) ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ : Set (r ⊔ a ⊔ s ⊔ b) where
-  constructor _∷⟨_⟩∷_[_,_]
+infixl 5 _⟅_⟆
+record _⟅_⟆ (left focus : 𝓡) : Set s where
+  constructor _∣_
   field
-    before : Σ
-    cursor : A
-    rest : Σ
-    ¬ℙ : ¬ ℙ (μ before)
-    !ℙ : ℙ (μ before ∙ μ cursor)
+    ¬ℙ : ¬ ℙ left
+    !ℙ : ℙ (left ∙ focus)
+open _⟅_⟆
+
+infixl 2 _≈◄⟅_⟆ _≈▻⟅_⟆ _≈⟅_∣_⟆ _◄_ _▻_
+_◄_ : ∀ {l f₁ f₂} → l ⟅ f₁ ∙ f₂ ⟆ → ¬ ℙ (l ∙ f₁) → l ∙ f₁ ⟅ f₂ ⟆
+!ℙ (p ◄ ¬ℙf) = ℙ-resp (sym (assoc _ _ _)) (!ℙ p)
+¬ℙ (p ◄ ¬ℙf) = ¬ℙf
+
+_▻_ : ∀ {l f₁ f₂} → l ⟅ f₁ ∙ f₂ ⟆ → ℙ (l ∙ f₁) → l ⟅ f₁ ⟆
+!ℙ (p ▻ ℙf) = ℙf
+¬ℙ (p ▻ ℙf) = ¬ℙ p
+
+_≈◄⟅_⟆ : ∀ {x y z} → x ⟅ y ⟆ → x ≈ z → z ⟅ y ⟆
+¬ℙ (x⟅y⟆ ≈◄⟅ x≈z ⟆) = ¬ℙ x⟅y⟆ ∘ ℙ-resp (sym x≈z)
+!ℙ (x⟅y⟆ ≈◄⟅ x≈z ⟆) = ℙ-resp (≪∙ x≈z) (!ℙ x⟅y⟆)
+
+_≈▻⟅_⟆ : ∀ {x y z} → x ⟅ y ⟆ → y ≈ z → x ⟅ z ⟆
+(¬ℙ ∣ !ℙ) ≈▻⟅ p ⟆ = ¬ℙ ∣ ℙ-resp (∙≫ p) !ℙ
+
+_≈⟅_∣_⟆ : ∀ {x₁ y₁ x₂ y₂} → x₁ ⟅ y₁ ⟆ → x₁ ≈ x₂ → y₁ ≈ y₂ → x₂ ⟅ y₂ ⟆
+¬ℙ (x⟅y⟆ ≈⟅ x≈ ∣ y≈ ⟆) = ¬ℙ x⟅y⟆ ∘ ℙ-resp (sym x≈)
+!ℙ (x⟅y⟆ ≈⟅ x≈ ∣ y≈ ⟆) = ℙ-resp (∙-cong x≈ y≈) (!ℙ x⟅y⟆)
+
+¬∄ℙ : ∀ {i} → ¬ i ⟅ ε ⟆
+¬∄ℙ (¬ℙ ∣ !ℙ) = ¬ℙ (ℙ-resp (identityʳ _) !ℙ)
+
+record Split (i : 𝓡) {a b} (Σ : Set a) (A : Set b) ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ : Set (a ⊔ b ⊔ s) where
+  constructor _∷⟨_⟩∷_[_]
+  field
+    left  : Σ
+    focus : A
+    right : Σ
+    proof : i ∙ μ left ⟅ μ focus ⟆
+open Split
+
 
 instance
-  σ-Split : ∀  {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ → σ (Split Σ A)
-  μ ⦃ σ-Split ⦄ (l ∷⟨ x ⟩∷ r [ _ , _ ]) =  μ l ∙ (μ x ∙ μ r)
+  σ-Split : ∀  {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ {i : 𝓡} → σ (Split i Σ A)
+  μ ⦃ σ-Split {i = i} ⦄ (l ∷⟨ x ⟩∷ r [ _ ]) = i ∙ (μ l ∙ (μ x ∙ μ r))
+
+infixl 2 _i≈[_]
+_i≈[_] : ∀ {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ → ∀ {i xs} → μ⟨ Split i Σ A ⟩≈ (i ∙ xs) → ∀ {j} → i ≈ j → μ⟨ Split j Σ A ⟩≈ (j ∙ xs)
+xs ∷⟨ x ⟩∷ ys [ p₁ ] ⇑[ p₂ ] i≈[ i≈ ] = xs ∷⟨ x ⟩∷ ys [ p₁ ≈◄⟅ ≪∙ i≈ ⟆ ] ⇑[ ≪∙ sym i≈ ⍮ p₂ ⍮ ≪∙ i≈ ]
 
 open import Data.Empty using (⊥-elim)
 
+infixl 2 _≈ℙ_[_]
+record ⟪ℙ⟫ (x : 𝓡) : Set (s ⊔ r ⊔ m) where
+  constructor _≈ℙ_[_]
+  field
+    result : Dec (ℙ x)
+    stored : 𝓡
+    equiv  : stored ≈ x
+open ⟪ℙ⟫
+
+⟪ℙ?⟫ : ∀ x → ⟪ℙ⟫ x
+result (⟪ℙ?⟫ x) = ℙ? x
+stored (⟪ℙ?⟫ x) = x
+equiv  (⟪ℙ?⟫ x) = refl
+
 module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
-  splitList : (xs : Split Σ (List Σ))  → μ⟨ Split (List Σ) Σ ⟩≈ (μ xs)
-  splitList (before ∷⟨ [] ⟩∷ rest [ ¬ℙ , !ℙ ]) = ⊥-elim (¬ℙ (lemma !ℙ ))
-    where
-    lemma = begin μ before ∙ ε ≈⟨ {!!} ⟩ μ before ∎
+  splitList : (i : 𝓡) → (xs : List Σ) → i ⟅ μ xs ⟆ → μ⟨ Split i (List Σ) Σ ⟩≈ (i ∙ μ xs)
+  splitList i [] s = ⊥-elim (¬∄ℙ s)
+  splitList i (x ∷ xs) s with ⟪ℙ?⟫ (i ∙ μ x)
+  ... | yes p ≈ℙ i∙x [ i∙x≈ ] = [] ∷⟨ x ⟩∷ xs [ s ▻ p ≈◄⟅ ℳ ↯ ⟆  ] ⇑[ ℳ ↯ ]
+  ... | no ¬p ≈ℙ i∙x [ i∙x≈ ] with splitList i∙x xs (s ◄ ¬p ≈◄⟅ sym i∙x≈ ⟆) i≈[ i∙x≈ ]
+  ... | ys ∷⟨ y ⟩∷ zs [ s′ ] ⇑[ ys≈ ] = (x ∷ ys) ∷⟨ y ⟩∷ zs [ s′ ≈◄⟅ ℳ ↯ ⟆ ] ⇑[ ℳ ↯ ] ≈[ ys≈ ]′ ≈[ ℳ ↯ ]
 
-  splitList (before ∷⟨ x ∷ cursor ⟩∷ rest [ ¬ℙ , !ℙ ]) = {!!}
-  -- splitList i ¬ℙ⟨i⟩ [] ℙ⟨i∙xs⟩ = ⊥-elim ( ¬ℙ⟨i⟩ (ℙ-resp (identityʳ _) ℙ⟨i∙xs⟩))
-  -- splitList i ¬ℙ⟨i⟩ (x ∷ xs) ℙ⟨i∙xs⟩ with ℙ? (i ∙ μ x)
-  -- ... | yes p = [] ∷⟨ x ⟩∷ xs [ ¬ℙ⟨i⟩ ∘ ℙ-resp (identityʳ _) , p ⇒ i ∙ (ε ∙ μ x) ⟨ ℳ ↯ ⟩ ] ↦ ℳ ↯
-  -- ... | no ¬p with splitList (i ∙ μ x) ¬p xs (ℙ-resp (sym (assoc _ _ _)) ℙ⟨i∙xs⟩)
-  -- ... | ys ∷⟨ y ⟩∷ zs [ ¬ℙ⟨ys⟩ , ℙ⟨y⟩ ] ↦ i∙x∙ys∙y∙zs≈i∙x∙xs = (x ∷ ys) ∷⟨ y ⟩∷ zs [ ¬ℙ⟨ys⟩ ∘ ℙ-resp (sym (assoc _ _ _)) ,  ℙ⟨y⟩ ⇒ i ∙ (μ x ∙ μ ys ∙ μ y) ⟨ ℳ ↯ ⟩ ] ↦ lemma
-  --   where
-  --   lemma =
-  --     begin
-  --       i ∙ (μ x ∙ μ ys ∙ (μ y ∙ μ zs))
-  --     ≈⟨ ℳ ↯ ⟩
-  --       i ∙ μ x ∙ (μ ys ∙ (μ y ∙ μ zs))
-  --     ≈⟨ i∙x∙ys∙y∙zs≈i∙x∙xs ⟩
-  --       i ∙ μ x ∙ μ xs
-  --     ≈⟨ assoc _ _ _ ⟩
-  --       i ∙ (μ x ∙ μ xs)
-  --     ∎
+  nodeToList : (xs : Node Σ) → μ⟨ List Σ ⟩≈ (μ xs)
+  nodeToList (N₂ x₁ x₂) = x₁ ∷ x₂ ∷ [] ⇑[ ℳ ↯ ]
+  nodeToList (N₃ x₁ x₂ x₃) = x₁ ∷ x₂ ∷ x₃ ∷ [] ⇑[ ℳ ↯ ]
 
---   nodeToList : (xs : Node Σ) → ⟨ List Σ ⟩μ⁻¹ (μ xs)
---   nodeToList (N₂ x₁ x₂) = x₁ ∷ x₂ ∷ [] ↦ ℳ ↯
---   nodeToList (N₃ x₁ x₂ x₃) = x₁ ∷ x₂ ∷ x₃ ∷ [] ↦ ℳ ↯
+  digitToList : (xs : Digit Σ) → μ⟨ List Σ ⟩≈ (μ xs)
+  digitToList (D₁ x₁) = x₁ ∷ [] ⇑[ ℳ ↯ ]
+  digitToList (D₂ x₁ x₂) = x₁ ∷ x₂ ∷ [] ⇑[ ℳ ↯ ]
+  digitToList (D₃ x₁ x₂ x₃) = x₁ ∷ x₂ ∷ x₃ ∷ [] ⇑[ ℳ ↯ ]
+  digitToList (D₄ x₁ x₂ x₃ x₄) = x₁ ∷ x₂ ∷ x₃ ∷ x₄ ∷ [] ⇑[ ℳ ↯ ]
 
---   digitToList : (xs : Digit Σ) → ⟨ List Σ ⟩μ⁻¹ (μ xs)
---   digitToList (D₁ x₁) = x₁ ∷ [] ↦ ℳ ↯
---   digitToList (D₂ x₁ x₂) = x₁ ∷ x₂ ∷ [] ↦ ℳ ↯
---   digitToList (D₃ x₁ x₂ x₃) = x₁ ∷ x₂ ∷ x₃ ∷ [] ↦ ℳ ↯
---   digitToList (D₄ x₁ x₂ x₃ x₄) = x₁ ∷ x₂ ∷ x₃ ∷ x₄ ∷ [] ↦ ℳ ↯
+  splitNode : ∀ i → (xs : Node Σ) → i ⟅ μ xs ⟆ → μ⟨ Split i (List Σ) Σ ⟩≈ (i ∙ μ xs)
+  splitNode i xs s =  nodeToList xs [ _ ∙> sz ⟿ sz ] (λ ys {x≈} → splitList i ys (s ≈▻⟅ sym x≈ ⟆))
 
---   splitNode : ∀ i → ¬ ℙ i → (xs : Node Σ) → ℙ (i ∙ μ xs) → ⟨ Split i (List Σ) Σ ⟩μ⁻¹ (i ∙ μ xs)
---   splitNode i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ with nodeToList xs
---   splitNode i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ with splitList i ¬ℙ⟨i⟩ ys (ℙ-resp (∙≫ sym μ⟨ys⟩≈μ⟨xs⟩) ℙ⟨i∙xs⟩)
---   splitNode i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ | zs ↦ i∙μ⟨zs⟩≈i∙μ⟨ys⟩ = zs ↦ (i∙μ⟨zs⟩≈i∙μ⟨ys⟩ ⍮ ∙≫ μ⟨ys⟩≈μ⟨xs⟩)
-
---   splitDigit : ∀ i → ¬ ℙ i → (xs : Digit Σ) → ℙ (i ∙ μ xs) → ⟨ Split i (List Σ) Σ ⟩μ⁻¹ (i ∙ μ xs)
---   splitDigit i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ with digitToList xs
---   splitDigit i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ with splitList i ¬ℙ⟨i⟩ ys (ℙ-resp (∙≫ sym μ⟨ys⟩≈μ⟨xs⟩) ℙ⟨i∙xs⟩)
---   splitDigit i ¬ℙ⟨i⟩ xs ℙ⟨i∙xs⟩ | ys ↦ μ⟨ys⟩≈μ⟨xs⟩ | zs ↦ i∙μ⟨zs⟩≈i∙μ⟨ys⟩ = zs ↦ (i∙μ⟨zs⟩≈i∙μ⟨ys⟩ ⍮ ∙≫ μ⟨ys⟩≈μ⟨xs⟩)
+  splitDigit : ∀ i → (xs : Digit Σ) → i ⟅ μ xs ⟆ → μ⟨ Split i (List Σ) Σ ⟩≈ (i ∙ μ xs)
+  splitDigit i xs s = digitToList xs [ _ ∙> sz ⟿ sz ] λ ys {x≈} → splitList i ys (s ≈▻⟅ sym x≈ ⟆)
 
 
---   splitTree-l : ∀ i → ¬ ℙ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫)  → (rs : Digit Σ) → ℙ (i ∙ μ ls) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
+  -- splitTree-l : ∀ i → ¬ ℙ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫)  → (rs : Digit Σ) → ℙ (i ∙ μ ls) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
 --   splitTree-l i ¬ℙ⟨i⟩ ls m rs ℙ⟨i∙ls⟩ with splitDigit i ¬ℙ⟨i⟩ ls ℙ⟨i∙ls⟩
 --   ... | lsₗ ∷⟨ mₗ ⟩∷ rsₗ [ p₁ , p₂ ] ↦ p₃ with listToTree lsₗ | deepₗ rsₗ m rs
 --   ... | ls′ ↦ ls′≈ | rs′ ↦ rs′≈ = ls′ ∷⟨ mₗ ⟩∷ rs′ [ p₁ ∘′ ℙ-resp (∙≫ ls′≈) , ℙ-resp (∙≫ ≪∙ sym ls′≈) p₂ ] ↦ lemma
@@ -160,7 +189,16 @@ module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
 
 
 
--- splitTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → ∀ i → ¬ ℙ i → (xs : Tree Σ) → ℙ (i ∙ μ xs) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹ (i ∙ μ xs)
+splitTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → ∀ i → (xs : Tree Σ) → i ⟅ μ xs ⟆ → μ⟨ Split i (Tree Σ) Σ ⟩≈ (i ∙ μ xs)
+splitTree i empty s = ⊥-elim (¬∄ℙ s)
+splitTree i (single x) s = empty ∷⟨ x ⟩∷ empty [ s ≈◄⟅ ℳ ↯ ⟆ ] ⇑[ ℳ ↯ ]
+splitTree i (deep (𝓂 ↤ ls & m & rs ⇑[ 𝓂≈ ])) s with ⟪ℙ?⟫ (i ∙ μ ls)
+... | yes p₁ ≈ℙ i∙ls [ i∙ls≈ ] = {!!}
+... | no ¬p₁ ≈ℙ i∙ls [ i∙ls≈ ] with ⟪ℙ?⟫ (i∙ls ∙ μ m)
+... | no ¬p₂ ≈ℙ i∙ls∙m [ i∙ls∙m≈ ] = {!!}
+... | yes p₂ ≈ℙ i∙ls∙m [ i∙ls∙m≈ ] with splitTree i∙ls m (s ≈▻⟅ sym 𝓂≈ ⟆ ◄ ¬p₁ ≈◄⟅ sym i∙ls≈ ⟆ ▻ p₂)
+... | res = {!!}
+
 -- splitTree i ¬ℙ⟨i⟩ empty ℙ⟨i∙xs⟩ = ⊥-elim (¬ℙ⟨i⟩ (ℙ-resp (identityʳ _) ℙ⟨i∙xs⟩))
 -- splitTree i ¬ℙ⟨i⟩ (single x) ℙ⟨i∙xs⟩ = empty ∷⟨ x ⟩∷ empty [ ¬ℙ⟨i⟩ ∘ ℙ-resp (identityʳ _) , ℙ⟨i∙xs⟩ ⇒ i ∙ (ε ∙ μ x) ⟨ ℳ ↯ ⟩ ] ↦ ℳ ↯
 -- splitTree i ¬ℙ⟨i⟩ (deep (μ⟨xs⟩ , ls & m & rs ↦ μ⟨xs⟩≈)) ℙ⟨i∙xs⟩ with ⟪ℙ? (i ∙ μ ls) ⇓⟫

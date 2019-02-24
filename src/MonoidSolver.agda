@@ -56,7 +56,7 @@ norm E = []
   go x [] (y ∷ ys) = refl
   go x₁ (x₂ ∷ xs) ys = ∙-cong refl (go x₂ xs ys) ⟨ trans ⟩ sym (assoc _ _ _)
 
-open import FasterReasoning setoid
+open import Relation.Binary.Reasoning.FasterInference.Setoid setoid
 
 correct : (e : Expr) → ⟦ norm e ⟧⇓ ≈ ⟦ e ⟧
 correct (K x) = refl
