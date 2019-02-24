@@ -49,3 +49,10 @@ syntax ↣-syntax y x≈y = x≈y ↣ y
 ↣↣-syntax _ _ x≈y = x≈y
 
 syntax ↣↣-syntax x y x≈y = x ↣⟨ x≈y ⟩↣ y
+
+infixl 6 _∙>_ _<∙_
+_∙>_ : ∀ x {y z} → y ≈ z → x ∙ y ≈ x ∙ z
+_ ∙> y≈z = ∙≫ y≈z
+
+_<∙_ : ∀ {x y} → x ≈ y → ∀ z → x ∙ z ≈ y ∙ z
+x≈y <∙ _ = ≪∙ x≈y
