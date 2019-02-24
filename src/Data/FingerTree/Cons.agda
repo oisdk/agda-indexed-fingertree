@@ -39,7 +39,7 @@ open import Data.List as List using (List; _∷_; [])
 
 listToTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : List Σ) → μ⟨ Tree Σ ⟩≈ (μ xs)
 listToTree [] = pure empty
-listToTree (x ∷ xs) = listToTree xs [ _ ∙> s ⟿ s ] λ ys → x ◂ ys ≈[ ℳ ↯ ]
+listToTree (x ∷ xs) = listToTree xs [ _ ∙> s ⟿ s ] >>= λ ys → x ◂ ys ≈[ ℳ ↯ ]
 
 _▸_ : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Tree Σ) → (x : Σ) → μ⟨ Tree Σ ⟩≈ (μ xs ∙ μ x)
 empty ▸ a = single a ⇑[ ℳ ↯ ]

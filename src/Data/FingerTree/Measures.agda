@@ -89,14 +89,34 @@ open import Algebra.FunctionProperties _≈_
 
 -- syntax map-size (λ sz → e₁) fn xs = [ e₁ ⟿ sz ] fn <$> xs
 
-infixl 2 cont-size
-cont-size : {f : 𝓡 → 𝓡}
-          → Congruent₁ f
-          → ∀ {a b} {Σ₁ : Set a} {Σ₂ : Set b} ⦃ _ : σ Σ₁ ⦄ ⦃ _ : σ Σ₂ ⦄
-          → {𝓂 : 𝓡}
-          → μ⟨ Σ₁ ⟩≈ 𝓂
-          → ((x : Σ₁) → {x≈ : μ x ≈ 𝓂 } → μ⟨ Σ₂ ⟩≈ (f (μ x)))
-          → μ⟨ Σ₂ ⟩≈ (f 𝓂)
-cont-size cng (x ⇑[ x≈ ]) f = f x {x≈} ≈[ cng x≈ ]
+infixl 2 arg-syntax
+record Arg {a} (Σ : Set a) ⦃ _ : σ Σ ⦄ (𝓂 : 𝓡) (f : 𝓡 → 𝓡) : Set (m ⊔ r ⊔ a) where
+  constructor arg-syntax
+  field
+    ⟨f⟩ : Congruent₁ f
+    xs : μ⟨ Σ ⟩≈ 𝓂
+open Arg
 
-syntax cont-size (λ sz → e₁) xs e₂ = xs [ e₁ ⟿ sz ] e₂
+syntax arg-syntax (λ sz → e₁) xs = xs [ e₁ ⟿ sz ]
+
+infixl 1 _>>=_
+_>>=_ : ∀ {a b} {Σ₁ : Set a} {Σ₂ : Set b} ⦃ _ : σ Σ₁ ⦄ ⦃ _ : σ Σ₂ ⦄ {𝓂 f}
+      → Arg Σ₁ 𝓂 f
+      → ((x : Σ₁) → ⦃ x≈ : μ x ≈ 𝓂 ⦄ → μ⟨ Σ₂ ⟩≈ f (μ x))
+      → μ⟨ Σ₂ ⟩≈ f 𝓂
+arg-syntax cng (x ⇑[ x≈ ]) >>= k = k x ⦃ x≈ ⦄ ≈[ cng x≈ ]
+
+_≈?_ : ∀ x y → ⦃ x≈y : x ≈ y ⦄ → x ≈ y
+_≈?_ _ _ ⦃ x≈y ⦄ = x≈y
+
+-- infixl 2 cont-size
+-- cont-size : {f : 𝓡 → 𝓡}
+--           → Congruent₁ f
+--           → ∀ {a b} {σ₁ : set a} {σ₂ : set b} ⦃ _ : σ σ₁ ⦄ ⦃ _ : σ σ₂ ⦄
+--           → {𝓂 : 𝓡}
+--           → μ⟨ Σ₁ ⟩≈ 𝓂
+--           → ((x : Σ₁) → {x≈ : μ x ≈ 𝓂 } → μ⟨ Σ₂ ⟩≈ (f (μ x)))
+--           → μ⟨ Σ₂ ⟩≈ (f 𝓂)
+-- cont-size cng (x ⇑[ x≈ ]) f = f x {x≈} ≈[ cng x≈ ]
+
+-- syntax cont-size (λ sz → e₁) xs e₂ = xs [ e₁ ⟿ sz ] e₂
