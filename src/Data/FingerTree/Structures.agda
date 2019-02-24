@@ -61,7 +61,7 @@ mutual
   μ-tree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → Tree Σ → 𝓡
   μ-tree empty = ε
   μ-tree (single x) = μ x
-  μ-tree (deep xs) = xs .proj₁
+  μ-tree (deep xs) = xs .𝔐
 
   instance
     σ-Deep : ∀ {a} {Σ : Set a} → ⦃ _ : σ Σ ⦄ → σ (Deep Σ)
@@ -75,12 +75,12 @@ open Deep
 {-# DISPLAY μ-tree _ x = μ x #-}
 {-# DISPLAY μ-deep _ x = μ x #-}
 
-nodeToDigit : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Node Σ) →  ⟨ Digit Σ ⟩μ⁻¹ (μ xs)
-nodeToDigit (N₂ x₁ x₂) = D₂ x₁ x₂ ↦ refl
-nodeToDigit (N₃ x₁ x₂ x₃) = D₃ x₁ x₂ x₃ ↦ refl
+nodeToDigit : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Node Σ) →  μ⟨ Digit Σ ⟩≈ (μ xs)
+nodeToDigit (N₂ x₁ x₂) = D₂ x₁ x₂ ⇑[ refl ]
+nodeToDigit (N₃ x₁ x₂ x₃) = D₃ x₁ x₂ x₃ ⇑[ refl ]
 
-digitToTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Digit Σ ) → ⟨ Tree Σ ⟩μ⁻¹ (μ xs)
-digitToTree (D₁ x₁ ) = single x₁ ↦ refl
-digitToTree (D₂ x₁ x₂ ) = deep ⟪ D₁ x₁ & empty & D₁ x₂ ⇓⟫ ↦ (μ x₁ ∙ (ε ∙ μ x₂) ↢ ℳ ↯)
-digitToTree (D₃ x₁ x₂ x₃ ) = deep ⟪ D₂ x₁ x₂ & empty & D₁ x₃ ⇓⟫ ↦ (μ (D₂ x₁ x₂) ∙ (ε ∙ μ x₃) ↢ ℳ ↯)
-digitToTree (D₄ x₁ x₂ x₃ x₄ ) = deep ⟪ D₂ x₁ x₂ & empty & D₂ x₃ x₄ ⇓⟫ ↦ (μ (D₂ x₁ x₂) ∙ (ε ∙ μ (D₂ x₃ x₄)) ↢ ℳ ↯)
+digitToTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Digit Σ ) → μ⟨ Tree Σ ⟩≈ (μ xs)
+digitToTree (D₁ x₁ ) = single x₁ ⇑[ refl ]
+digitToTree (D₂ x₁ x₂ ) = deep ⟪ D₁ x₁ & empty & D₁ x₂ ⇓⟫ ⇑[ μ x₁ ∙ (ε ∙ μ x₂) ↢ ℳ ↯ ]
+digitToTree (D₃ x₁ x₂ x₃ ) = deep ⟪ D₂ x₁ x₂ & empty & D₁ x₃ ⇓⟫ ⇑[ μ (D₂ x₁ x₂) ∙ (ε ∙ μ x₃) ↢ ℳ ↯ ]
+digitToTree (D₄ x₁ x₂ x₃ x₄ ) = deep ⟪ D₂ x₁ x₂ & empty & D₂ x₃ x₄ ⇓⟫ ⇑[ μ (D₂ x₁ x₂) ∙ (ε ∙ μ (D₂ x₃ x₄)) ↢ ℳ ↯ ]
