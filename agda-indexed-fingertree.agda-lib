@@ -1,3 +1,0 @@
-name: agda-indexed-fingertree
-include: src
-depend: standard-library
