@@ -1,4 +1,40 @@
-{-# OPTIONS --without-K --safe #-}
+-- Donnacha Oisín Kidney                                ABOUT CONTACT FEED SNIPPETS
+-- ================================================================================
+
+-- ┌──────────────────────────────────────────────────────────────────────────────┐
+-- │         oooooooooooo  o8o                                                    │
+-- │         `888'     `8  `"'                                                    │
+-- │          888         oooo  ooo. .oo.    .oooooooo  .ooooo.  oooo d8b         │
+-- │          888oooo8    `888  `888P"Y88b  888' `88b  d88' `88b `888""8P         │
+-- │          888    "     888   888   888  888   888  888ooo888  888             │
+-- │          888          888   888   888  `88bod8P'  888    .o  888             │
+-- │         o888o        o888o o888o o888o `8oooooo.  `Y8bod8P' d888b            │
+-- │                                        d"     YD                             │
+-- │                                        "Y88888P'                             │
+-- │                                                                              │
+-- │   ooooooooooooo                                          ooooo               │
+-- │   8'   888   `8                                          `888'               │
+-- │        888      oooo d8b  .ooooo.   .ooooo.   .oooo.o     888  ooo. .oo.     │
+-- │        888      `888""8P d88' `88b d88' `88b d88(  "8     888  `888P"Y88b    │
+-- │        888       888     888ooo888 888ooo888 `"Y88b.      888   888   888    │
+-- │        888       888     888    .o 888    .o o.  )88b     888   888   888    │
+-- │       o888o     d888b    `Y8bod8P' `Y8bod8P' 8""888P'    o888o o888o o888o   │
+-- │                                                                              │
+-- │                                                                              │
+-- │                                                                              │
+-- │                     .o.                        .o8                           │
+-- │                    .888.                      "888                           │
+-- │                   .8"888.      .oooooooo  .oooo888   .oooo.                  │
+-- │                  .8' `888.    888' `88b  d88' `888  `P  )88b                 │
+-- │                 .88ooo8888.   888   888  888   888   .oP"888                 │
+-- │                .8'     `888.  `88bod8P'  888   888  d8(  888                 │
+-- │               o88o     o8888o `8oooooo.  `Y8bod88P" `Y888""8o                │
+-- │                               d"     YD                                      │
+-- │                               "Y88888P'                                      │
+-- └──────────────────────────────────────────────────────────────────────────────┘
+
+-- Posted on February 25, 2019
+
 
 open import Data.FingerTree.Preamble
 
@@ -54,6 +90,7 @@ module _ where
 -- │                \_/ \___|_|  |_|_| |_|\___\__,_|\__|_|\___/|_| |_|            │
 -- │                                                                              │
 -- └──────────────────────────────────────────────────────────────────────────────┘
+
 -- There would be no real point to implementing a finger tree in Agda if we didn't
 -- also prove some things about it. The scope of the proofs I've done so far are
 -- intrinsic proofs of the summaries in the tree. In other words, the type of
@@ -72,6 +109,7 @@ module _ where
 -- To be honest, I'm not even sure that my current implementation is correct in
 -- these regards! I'll probably have a go at proving them in the future [possibly
 -- using @danielsson_lightweight_2008].
+
 -- ┌──────────────────────────────────────────────────────────────────────────────┐
 -- │                                                                              │
 -- │           __  __                   _     _                       _           │
@@ -92,7 +130,11 @@ module _ where
 -- we're going to need a *lot* of proofs to write a verified version. The good news
 -- is that monoids (in contrast to rings) are extremely easy to prove
 -- automatically. In this project, I used reflection to do so, but I think it
--- should be possible to do with instance resolution also.
+-- should be possible to do with instance resolution also. The monoid solver is
+-- here:
+
+import MonoidSolver
+
 -- ┌──────────────────────────────────────────────────────────────────────────────┐
 -- │                                                                              │
 -- │                                                                              │
@@ -282,11 +324,38 @@ listToTree (x ∷ xs) = [ ℳ ↯ ]≈ do
 -- It tells us where the size of the bound variable will end up in the outer
 -- expression.
 
--- Here are the available modules:
---
-import Data.FingerTree.Reasoning
-import Data.FingerTree.Cons
+-- ┌──────────────────────────────────────────────────────────────────────────────┐
+-- │                                                                              │
+-- │                                                                              │
+-- │                                                                              │
+-- │                                                                              │
+-- │                                                                              │
+-- │                     __  __           _       _                               │
+-- │                    |  \/  | ___   __| |_   _| | ___  ___                     │
+-- │                    | |\/| |/ _ \ / _` | | | | |/ _ \/ __|                    │
+-- │                    | |  | | (_) | (_| | |_| | |  __/\__ \                    │
+-- │                    |_|  |_|\___/ \__,_|\__,_|_|\___||___/                    │
+-- │                                                                              │
+-- │                                                                              │
+-- │                                                                              │
+-- │                                                                              │
+-- │                                                                              │
+-- └──────────────────────────────────────────────────────────────────────────────┘
+
+-- Definition of Measures and so on:
 import Data.FingerTree.Measures
+
+-- Tools for writing proofs:
+import Data.FingerTree.Reasoning
+
+-- The finger tree type:
 import Data.FingerTree.Structures
-import Data.FingerTree.Split
+
+-- Cons and Snoc
+import Data.FingerTree.Cons
+
+-- Uncons and Unsnoc
 import Data.FingerTree.View
+
+-- Split
+import Data.FingerTree.Split
