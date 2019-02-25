@@ -47,30 +47,26 @@ open Imports imports
 import Data.FingerTree.Measures
 module Measures = Data.FingerTree.Measures ℳ
 
--- As I have talked about [previously](/posts/2019-01-15-binomial-urn.html), a
--- large class of divide-and conquer algorithms rely on "good" partitioning for the
--- divide step. If you then want to make the algorithms incremental, you keep all
--- of those partitions (with their summaries) in some "good" arrangement
--- [@mu_queueing_2016].  Several common data structures are designed around this
--- principle: binomial heaps, for instance, store partitions of size $2^n$.
--- Different ways of storing partitions favours different use cases: switch from a
--- binomial heap to a skew binomial, for instance, and you get constant-time
--- `cons`.
+-- As I have talked about previously, a large class of divide-and conquer
+-- algorithms rely on "good" partitioning for the divide step. If you then want to
+-- make the algorithms incremental, you keep all of those partitions (with their
+-- summaries) in some "good" arrangement [1]. Several common data structures are
+-- designed around this principle: binomial heaps, for instance, store partitions
+-- of size 2ⁿ. Different ways of storing partitions favours different use cases:
+-- switch from a binomial heap to a skew binomial, for instance, and you get
+-- constant-time cons.
 
--- The standout data structure in this area is Hinze and Paterson's
--- [@Hinze-Paterson:FingerTree]. It caches summaries in a pretty amazing way,
--- allowing for (amortised) 𝒪(1) cons and snoc and
--- 𝒪(\log n) `split` and `append`. These features allow it to be used
--- for a huge variety of things:
--- [Data.Sequence](http://hackage.haskell.org/package/containers-0.6.0.1/docs/Data-Sequence.html)
--- uses it as a random-access sequence, but it can also work as a priority queue, a
--- search tree, a priority search tree [@hinze_simple_2001], an interval tree, an
--- order statistic tree...
+-- The standout data structure in this area is Hinze and Paterson's finger tree
+-- [2]. It caches summaries in a pretty amazing way, allowing for (amortised) 𝒪(1)
+-- cons and snoc and 𝒪(log n) split and append. These features allow it to be used
+-- for a huge variety of things: Data.Sequence uses it as a random-access sequence,
+-- but it can also work as a priority queue, a search tree, a priority search tree
+-- [3], an interval tree, an order statistic tree...
 
 -- All of these applications solely rely on an underlying monoid. As a result, I
 -- thought it would be a great data structure to implement in Agda, so that you'd
 -- get all of the other data structures with minimal effort [similar thinking
--- motivated a Coq implementation; @sozeau_program-ing_2007].
+-- motivated a Coq implementation; 4]
 
 module _ where
  open Measures
@@ -94,7 +90,7 @@ module _ where
 -- There would be no real point to implementing a finger tree in Agda if we didn't
 -- also prove some things about it. The scope of the proofs I've done so far are
 -- intrinsic proofs of the summaries in the tree. In other words, the type of
--- `cons` is as follows:
+-- cons is as follows:
 
  _ : (x : A) → (xs : Tree A) → μ⟨ Tree A ⟩≈ (μ x ∙ μ xs)
  _ = _◂_
@@ -108,7 +104,7 @@ module _ where
 --
 -- To be honest, I'm not even sure that my current implementation is correct in
 -- these regards! I'll probably have a go at proving them in the future [possibly
--- using @danielsson_lightweight_2008].
+-- using 5].
 
 -- ┌──────────────────────────────────────────────────────────────────────────────┐
 -- │                                                                              │
@@ -133,7 +129,7 @@ module _ where
 -- should be possible to do with instance resolution also. The monoid solver is
 -- here:
 
-import MonoidSolver
+import Data.FingerTree.MonoidSolver
 
 -- ┌──────────────────────────────────────────────────────────────────────────────┐
 -- │                                                                              │
@@ -212,8 +208,8 @@ map f [] = []
 map f (x ∷ xs) = f x ∷ map f xs
 
 -- But that's because pattern matching works well with propositional equality: in
--- the first clause, `n` is set to `0` automatically. If we were working with
--- setoid equality, we'd instead maybe get a proof that `n ≈ 0`, and we'd have to
+-- the first clause, n is set to 0 automatically. If we were working with
+-- setoid equality, we'd instead maybe get a proof that n ≈ 0, and we'd have to
 -- figure a way to work that into the types.
 
 open Measures hiding (arg-syntax; _>>=_; μ⟨_⟩≈_; 𝓢; 𝒻; _≈[_]; σ; Arg)
@@ -316,7 +312,7 @@ listToTree (x ∷ xs) = [ ℳ ↯ ]≈ do
   x ◂ ys
 
 -- The first line is the base case, nothing interesting going on there. The second
--- line begins the do-notation, but first applies `[ ℳ ↯ ]≈`: this calls the
+-- line begins the do-notation, but first applies [ ℳ ↯ ]≈: this calls the
 -- automated solver. The second line makes the recursive call, and with the syntax:
 --
 --   [ μ x ∙> s ⟿ s ]
@@ -342,13 +338,13 @@ listToTree (x ∷ xs) = [ ℳ ↯ ]≈ do
 -- │                                                                              │
 -- └──────────────────────────────────────────────────────────────────────────────┘
 
--- Definition of Measures and so on:
+-- Definition of Measures and so on
 import Data.FingerTree.Measures
 
--- Tools for writing proofs:
+-- Tools for writing proofs
 import Data.FingerTree.Reasoning
 
--- The finger tree type:
+-- The finger tree type
 import Data.FingerTree.Structures
 
 -- Cons and Snoc
@@ -359,3 +355,45 @@ import Data.FingerTree.View
 
 -- Split
 import Data.FingerTree.Split
+
+-- ┌──────────────────────────────────────────────────────────────────────────────┐
+-- │                    ___      __                                               │
+-- │                   | _ \___ / _|___ _ _ ___ _ _  __ ___ ___                   │
+-- │                   |   / -_)  _/ -_) '_/ -_) ' \/ _/ -_|_-<                   │
+-- │                   |_|_\___|_| \___|_| \___|_||_\__\___/__/                   │
+-- │                                                                              │
+-- └──────────────────────────────────────────────────────────────────────────────┘
+
+-- [1]
+-- Mu, Shin-Cheng, Yu-Hsi Chiang, and Yu-Han Lyu. 2016. “Queueing and Glueing for
+-- Optimal Partitioning (Functional Pearl).” In Proceedings of the 21st ACM SIGPLAN
+-- International Conference on Functional Programming, 158–167. ICFP 2016. New
+-- York, NY, USA: ACM. doi:10.1145/2951913.2951923.
+-- https://www.iis.sinica.edu.tw/~scm/pub/queueing-glueing.pdf.
+
+-- [2]
+-- Hinze, Ralf, and Ross Paterson. 2006. “Finger Trees: A Simple General-purpose
+-- Data Structure.” Journal of Functional Programming 16 (2): 197–217.
+-- http://www.staff.city.ac.uk/~ross/papers/FingerTree.html.
+
+-- [3]
+-- Hinze, Ralf. 2001. “A Simple Implementation Technique for Priority Search
+-- Queues.” In Proceedings of the 2001 International Conference on Functional
+-- Programming, 110–121. ACM Press. doi:10.1145/507635.507650.
+-- https://www.cs.ox.ac.uk/people/ralf.hinze/publications/\#P14.
+
+-- [4]
+-- Sozeau, Matthieu. 2007. “Program-ing Finger Trees in Coq.” In Proceedings of the
+-- 12th ACM SIGPLAN International Conference on Functional Programming, 13–24. ICFP
+-- ’07. New York, NY, USA: ACM. doi:10.1145/1291151.1291156.
+-- https://www.irif.fr/~sozeau/research/publications/Program-ing_Finger_Trees_in_Coq.pdf.
+
+-- [5]
+-- Danielsson, Nils Anders. 2008. “Lightweight Semiformal Time Complexity Analysis
+-- for Purely Functional Data Structures.” In Proceedings of the 35th Annual ACM
+-- SIGPLAN-SIGACT Symposium on Principles of Programming Languages, 133–144. POPL
+-- ’08. New York, NY, USA: ACM. doi:10.1145/1328438.1328457.
+-- http://www.cse.chalmers.se/~nad/publications/danielsson-popl2008.pdf.
+
+
+

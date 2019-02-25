@@ -2,7 +2,7 @@
 
 open import Algebra using (Monoid)
 
-module MonoidSolver {ℓ₁ ℓ₂} (mon : Monoid ℓ₁ ℓ₂) where
+module Data.FingerTree.MonoidSolver {ℓ₁ ℓ₂} (mon : Monoid ℓ₁ ℓ₂) where
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 open import Data.List as List using (List; _∷_; []; foldr; _++_)
@@ -56,7 +56,7 @@ norm E = []
   go x [] (y ∷ ys) = refl
   go x₁ (x₂ ∷ xs) ys = ∙-cong refl (go x₂ xs ys) ⟨ trans ⟩ sym (assoc _ _ _)
 
-open import Relation.Binary.Reasoning.FasterInference.Setoid setoid
+open import Data.FingerTree.Relation.Binary.Reasoning.FasterInference.Setoid setoid
 
 correct : (e : Expr) → ⟦ norm e ⟧⇓ ≈ ⟦ e ⟧
 correct (K x) = refl

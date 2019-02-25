@@ -9,7 +9,7 @@ module Data.FingerTree.Reasoning
 
 open Monoid ℳ renaming (Carrier to 𝓡)
 
-open import MonoidSolver ℳ using (solve-macro)
+open import Data.FingerTree.MonoidSolver ℳ using (solve-macro)
 
 open import Data.Unit using (⊤)
 open import Reflection using (TC; Term)

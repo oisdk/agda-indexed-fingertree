@@ -34,7 +34,7 @@ open σ ⦃ ... ⦄
 
 open Monoid ℳ renaming (Carrier to 𝓡)
 
-open import Relation.Binary.Reasoning.FasterInference.Setoid setoid
+open import Data.FingerTree.Relation.Binary.Reasoning.FasterInference.Setoid setoid
 
 infixr 5 _∣_
 record _∣_ (left focus : 𝓡) : Set s where
