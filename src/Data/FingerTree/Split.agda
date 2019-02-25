@@ -190,3 +190,13 @@ splitTree i (deep (𝓂 ↤ ls & m & rs ⇑[ 𝓂≈ ])) s with ⟪ℙ?⟫ (i �
     i ∙ (μ ls ∙ (μ m ∙ μ rs))
       ≈⟨ ∙≫ 𝓂≈ ⟩
     i ∙ 𝓂 ∎
+
+open import Relation.Nullary using (Dec; yes; no)
+open import Relation.Nullary.Decidable using (True; toWitness; False; toWitnessFalse)
+
+split : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄
+      → {¬ℙ⟨ε⟩ : False (ℙ? ε)}
+      → (xs : Tree Σ)
+      → {ℙ⟨xs⟩ : True (ℙ? (μ xs))}
+      → μ⟨ Split ε (Tree Σ) Σ ⟩≈ μ xs
+split {¬ℙ⟨ε⟩ = ¬ℙ⟨ε⟩} xs {ℙ⟨xs⟩} = splitTree ε xs (toWitnessFalse ¬ℙ⟨ε⟩ ∣ ℙ-resp (sym (identityˡ _)) (toWitness ℙ⟨xs⟩)) ≈[ identityˡ _ ]
