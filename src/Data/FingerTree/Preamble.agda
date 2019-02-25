@@ -13,9 +13,11 @@ record Imports c m a : Set (ℓ.suc (c ⊔ m ⊔ a)) where
   open Monoid ℳ hiding (refl) renaming (Carrier to 𝓡) public
   field
     A : Set a
-  open Data.FingerTree.Measures ℳ hiding (_≈[_]; Arg; arg-syntax; _>>=_) public
+  open Data.FingerTree.Measures ℳ using (σ) public
   open σ ⦃ ... ⦄ public
   field
     ⦃ σ-A ⦄ : σ A
   open import Algebra.FunctionProperties _≈_ public
   open import Data.FingerTree.Reasoning ℳ public
+  open import Data.FingerTree.Cons ℳ using (_◂_) public
+  open import Data.FingerTree.Structures ℳ public
