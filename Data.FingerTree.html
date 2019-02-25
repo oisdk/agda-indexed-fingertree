@@ -1,0 +1,402 @@
+<!DOCTYPE HTML>
+
+<html><head><meta charset="utf-8"/><title>Data.FingerTree</title><link href="Agda.css" rel="stylesheet"/></head><body><pre><a class="Comment" id="1">-- <a href="https://doisinkidney.com/">Donnacha Oisín Kidney</a>                                <a href="https://doisinkidney.com/about.html">ABOUT</a> <a href="https://doisinkidney.com/contact.html">CONTACT</a> <a href="https://doisinkidney.com/rss.xml">FEED</a> <a href="https://doisinkidney.com/snippets.html">SNIPPETS</a> </a>
+<a class="Comment" id="85">-- ================================================================================</a>
+
+<a class="Comment" id="170">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="254">-- │         oooooooooooo  o8o                                                    │</a>
+<a class="Comment" id="338">-- │         `888'     `8  `"'                                                    │</a>
+<a class="Comment" id="422">-- │          888         oooo  ooo. .oo.    .oooooooo  .ooooo.  oooo d8b         │</a>
+<a class="Comment" id="506">-- │          888oooo8    `888  `888P"Y88b  888' `88b  d88' `88b `888""8P         │</a>
+<a class="Comment" id="590">-- │          888    "     888   888   888  888   888  888ooo888  888             │</a>
+<a class="Comment" id="674">-- │          888          888   888   888  `88bod8P'  888    .o  888             │</a>
+<a class="Comment" id="758">-- │         o888o        o888o o888o o888o `8oooooo.  `Y8bod8P' d888b            │</a>
+<a class="Comment" id="842">-- │                                        d"     YD                             │</a>
+<a class="Comment" id="926">-- │                                        "Y88888P'                             │</a>
+<a class="Comment" id="1010">-- │                                                                              │</a>
+<a class="Comment" id="1094">-- │   ooooooooooooo                                          ooooo               │</a>
+<a class="Comment" id="1178">-- │   8'   888   `8                                          `888'               │</a>
+<a class="Comment" id="1262">-- │        888      oooo d8b  .ooooo.   .ooooo.   .oooo.o     888  ooo. .oo.     │</a>
+<a class="Comment" id="1346">-- │        888      `888""8P d88' `88b d88' `88b d88(  "8     888  `888P"Y88b    │</a>
+<a class="Comment" id="1430">-- │        888       888     888ooo888 888ooo888 `"Y88b.      888   888   888    │</a>
+<a class="Comment" id="1514">-- │        888       888     888    .o 888    .o o.  )88b     888   888   888    │</a>
+<a class="Comment" id="1598">-- │       o888o     d888b    `Y8bod8P' `Y8bod8P' 8""888P'    o888o o888o o888o   │</a>
+<a class="Comment" id="1682">-- │                                                                              │</a>
+<a class="Comment" id="1766">-- │                                                                              │</a>
+<a class="Comment" id="1850">-- │                                                                              │</a>
+<a class="Comment" id="1934">-- │                     .o.                        .o8                           │</a>
+<a class="Comment" id="2018">-- │                    .888.                      "888                           │</a>
+<a class="Comment" id="2102">-- │                   .8"888.      .oooooooo  .oooo888   .oooo.                  │</a>
+<a class="Comment" id="2186">-- │                  .8' `888.    888' `88b  d88' `888  `P  )88b                 │</a>
+<a class="Comment" id="2270">-- │                 .88ooo8888.   888   888  888   888   .oP"888                 │</a>
+<a class="Comment" id="2354">-- │                .8'     `888.  `88bod8P'  888   888  d8(  888                 │</a>
+<a class="Comment" id="2438">-- │               o88o     o8888o `8oooooo.  `Y8bod88P" `Y888""8o                │</a>
+<a class="Comment" id="2522">-- │                               d"     YD                                      │</a>
+<a class="Comment" id="2606">-- │                               "Y88888P'                                      │</a>
+<a class="Comment" id="2690">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+
+<a class="Comment" id="2775">-- Posted on February 25, 2019</a>
+
+
+<a class="Keyword" id="2808">open</a> <a class="Keyword" id="2813">import</a> <a class="Module" href="Data.FingerTree.Preamble.html" id="2820">Data.FingerTree.Preamble</a>
+
+<a class="Keyword" id="2846">module</a> <a class="Module" href="Data.FingerTree.html" id="2853">Data.FingerTree</a>
+  <a class="Symbol" id="2871">{</a><a class="Bound" href="Data.FingerTree.html#2872" id="2872">c</a> <a class="Bound" href="Data.FingerTree.html#2874" id="2874">m</a> <a class="Bound" href="Data.FingerTree.html#2876" id="2876">a</a><a class="Symbol" id="2877">}</a>
+  <a class="Symbol" id="2881">(</a><a class="Bound" href="Data.FingerTree.html#2882" id="2882">imports</a> <a class="Symbol" id="2890">:</a> <a class="Record" href="Data.FingerTree.Preamble.html#363" id="2892">Imports</a> <a class="Bound" href="Data.FingerTree.html#2872" id="2900">c</a> <a class="Bound" href="Data.FingerTree.html#2874" id="2902">m</a> <a class="Bound" href="Data.FingerTree.html#2876" id="2904">a</a><a class="Symbol" id="2905">)</a>
+  <a class="Keyword" id="2909">where</a>
+
+<a class="Keyword" id="2916">open</a> <a class="Module" href="Data.FingerTree.Preamble.html#363" id="2921">Imports</a> <a class="Bound" href="Data.FingerTree.html#2882" id="2929">imports</a>
+<a class="Keyword" id="2937">import</a> <a class="Module" href="Data.FingerTree.Measures.html" id="2944">Data.FingerTree.Measures</a>
+<a class="Keyword" id="2969">module</a> <a id="Measures"></a><a class="Module" href="Data.FingerTree.html#2976" id="2976">Measures</a> <a class="Symbol" id="2985">=</a> <a class="Module" href="Data.FingerTree.Measures.html" id="2987">Data.FingerTree.Measures</a> <a class="Field" href="Data.FingerTree.Preamble.html#421" id="3012">ℳ</a>
+
+<a class="Comment" id="3015">-- As I have talked about previously, a large class of divide-and conquer</a>
+<a class="Comment" id="3089">-- algorithms rely on "good" partitioning for the divide step. If you then want to</a>
+<a class="Comment" id="3172">-- make the algorithms incremental, you keep all of those partitions (with their</a>
+<a class="Comment" id="3253">-- summaries) in some "good" arrangement [1]. Several common data structures are</a>
+<a class="Comment" id="3334">-- designed around this principle: binomial heaps, for instance, store partitions</a>
+<a class="Comment" id="3416">-- of size 2ⁿ. Different ways of storing partitions favours different use cases:</a>
+<a class="Comment" id="3497">-- switch from a binomial heap to a skew binomial, for instance, and you get</a>
+<a class="Comment" id="3574">-- constant-time cons.</a>
+
+<a class="Comment" id="3598">-- The standout data structure in this area is Hinze and Paterson's finger tree</a>
+<a class="Comment" id="3678">-- [2]. It caches summaries in a pretty amazing way, allowing for (amortised) 𝒪(1)</a>
+<a class="Comment" id="3761">-- cons and snoc and 𝒪(log n) split and append. These features allow it to be used</a>
+<a class="Comment" id="3844">-- for a huge variety of things: Data.Sequence uses it as a random-access sequence,</a>
+<a class="Comment" id="3928">-- but it can also work as a priority queue, a search tree, a priority search tree</a>
+<a class="Comment" id="4011">-- [3], an interval tree, an order statistic tree...</a>
+
+<a class="Comment" id="4065">-- All of these applications solely rely on an underlying monoid. As a result, I</a>
+<a class="Comment" id="4146">-- thought it would be a great data structure to implement in Agda, so that you'd</a>
+<a class="Comment" id="4228">-- get all of the other data structures with minimal effort [similar thinking</a>
+<a class="Comment" id="4306">-- motivated a Coq implementation; 4]</a>
+
+<a class="Keyword" id="4345">module</a> <a class="Module" href="Data.FingerTree.html#4352" id="4352">_</a> <a class="Keyword" id="4354">where</a>
+ <a class="Keyword" id="4361">open</a> <a class="Module" href="Data.FingerTree.html#2976" id="4366">Measures</a>
+
+<a class="Comment" id="4376">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="4460">-- │                                                                              │</a>
+<a class="Comment" id="4544">-- │                    ____                                __                    │</a>
+<a class="Comment" id="4628">-- │                   / ___|  ___ ___  _ __   ___    ___  / _|                   │</a>
+<a class="Comment" id="4712">-- │                   \___ \ / __/ _ \| '_ \ / _ \  / _ \| |_                    │</a>
+<a class="Comment" id="4796">-- │                    ___) | (_| (_) | |_) |  __/ | (_) |  _|                   │</a>
+<a class="Comment" id="4880">-- │                   |____/ \___\___/| .__/ \___|  \___/|_|                     │</a>
+<a class="Comment" id="4964">-- │                                   |_|                                        │</a>
+<a class="Comment" id="5048">-- │             __     __        _  __ _           _   _                         │</a>
+<a class="Comment" id="5132">-- │             \ \   / /__ _ __(_)/ _(_) ___ __ _| |_(_) ___  _ __              │</a>
+<a class="Comment" id="5216">-- │              \ \ / / _ \ '__| | |_| |/ __/ _` | __| |/ _ \| '_ \             │</a>
+<a class="Comment" id="5300">-- │               \ V /  __/ |  | |  _| | (_| (_| | |_| | (_) | | | |            │</a>
+<a class="Comment" id="5384">-- │                \_/ \___|_|  |_|_| |_|\___\__,_|\__|_|\___/|_| |_|            │</a>
+<a class="Comment" id="5468">-- │                                                                              │</a>
+<a class="Comment" id="5552">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+
+<a class="Comment" id="5637">-- There would be no real point to implementing a finger tree in Agda if we didn't</a>
+<a class="Comment" id="5720">-- also prove some things about it. The scope of the proofs I've done so far are</a>
+<a class="Comment" id="5801">-- intrinsic proofs of the summaries in the tree. In other words, the type of</a>
+<a class="Comment" id="5879">-- cons is as follows:</a>
+
+ <a class="Function" href="Data.FingerTree.html#5904" id="5904">_</a> <a class="Symbol" id="5906">:</a> <a class="Symbol" id="5908">(</a><a class="Bound" href="Data.FingerTree.html#5909" id="5909">x</a> <a class="Symbol" id="5911">:</a> <a class="Field" href="Data.FingerTree.Preamble.html#509" id="5913">A</a><a class="Symbol" id="5914">)</a> <a class="Symbol" id="5916">→</a> <a class="Symbol" id="5918">(</a><a class="Bound" href="Data.FingerTree.html#5919" id="5919">xs</a> <a class="Symbol" id="5922">:</a> <a class="Datatype" href="Data.FingerTree.Structures.html#1236" id="5924">Tree</a> <a class="Field" href="Data.FingerTree.Preamble.html#509" id="5929">A</a><a class="Symbol" id="5930">)</a> <a class="Symbol" id="5932">→</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="5934">μ⟨</a> <a class="Datatype" href="Data.FingerTree.Structures.html#1236" id="5937">Tree</a> <a class="Field" href="Data.FingerTree.Preamble.html#509" id="5942">A</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="5944">⟩≈</a> <a class="Symbol" id="5947">(</a><a class="Field" href="Data.FingerTree.Measures.html#361" id="5948">μ</a> <a class="Bound" href="Data.FingerTree.html#5909" id="5950">x</a> <a class="Function Operator" href="https://agda.github.io/agda-stdlib/Algebra.html#2653" id="5952">∙</a> <a class="Field" href="Data.FingerTree.Measures.html#361" id="5954">μ</a> <a class="Bound" href="Data.FingerTree.html#5919" id="5956">xs</a><a class="Symbol" id="5958">)</a>
+ <a class="Symbol" id="5961">_</a> <a class="Symbol" id="5963">=</a> <a class="Function Operator" href="Data.FingerTree.Cons.html#447" id="5965">_◂_</a>
+
+<a class="Comment" id="5970">-- This is enough to prove things about the derived data structures (like the</a>
+<a class="Comment" id="6048">-- correctness of sorting if it's used as a priority queue), but it's worth</a>
+<a class="Comment" id="6124">-- pointing out what I *haven't* proved (yet):</a>
+<a class="Comment" id="6171">--</a>
+<a class="Comment" id="6174">--   1. Invariants on the structure ("safe" and "unsafe" digits and so on).</a>
+<a class="Comment" id="6250">--   2. The time complexity or performance of any operations.</a>
+<a class="Comment" id="6312">--</a>
+<a class="Comment" id="6315">-- To be honest, I'm not even sure that my current implementation is correct in</a>
+<a class="Comment" id="6395">-- these regards! I'll probably have a go at proving them in the future [possibly</a>
+<a class="Comment" id="6477">-- using 5].</a>
+
+<a class="Comment" id="6491">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="6575">-- │                                                                              │</a>
+<a class="Comment" id="6659">-- │           __  __                   _     _                       _           │</a>
+<a class="Comment" id="6743">-- │          |  \/  | ___  _ __   ___ (_) __| |___    __ _ _ __   __| |          │</a>
+<a class="Comment" id="6827">-- │          | |\/| |/ _ \| '_ \ / _ \| |/ _` / __|  / _` | '_ \ / _` |          │</a>
+<a class="Comment" id="6911">-- │          | |  | | (_) | | | | (_) | | (_| \__ \ | (_| | | | | (_| |          │</a>
+<a class="Comment" id="6995">-- │          |_|  |_|\___/|_| |_|\___/|_|\__,_|___/  \__,_|_| |_|\__,_|          │</a>
+<a class="Comment" id="7079">-- │                                                                              │</a>
+<a class="Comment" id="7163">-- │                         ____                   __                            │</a>
+<a class="Comment" id="7247">-- │                        |  _ \ _ __ ___   ___  / _|___                        │</a>
+<a class="Comment" id="7331">-- │                        | |_) | '__/ _ \ / _ \| |_/ __|                       │</a>
+<a class="Comment" id="7415">-- │                        |  __/| | | (_) | (_) |  _\__ \                       │</a>
+<a class="Comment" id="7499">-- │                        |_|   |_|  \___/ \___/|_| |___/                       │</a>
+<a class="Comment" id="7583">-- │                                                                              │</a>
+<a class="Comment" id="7667">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+
+<a class="Comment" id="7752">-- The bad news is that finger trees are a relatively complex data structure, and</a>
+<a class="Comment" id="7834">-- we're going to need a *lot* of proofs to write a verified version. The good news</a>
+<a class="Comment" id="7918">-- is that monoids (in contrast to rings) are extremely easy to prove</a>
+<a class="Comment" id="7988">-- automatically. In this project, I used reflection to do so, but I think it</a>
+<a class="Comment" id="8066">-- should be possible to do with instance resolution also. The monoid solver is</a>
+<a class="Comment" id="8146">-- here:</a>
+
+<a class="Keyword" id="8156">import</a> <a class="Module" href="Data.FingerTree.MonoidSolver.html" id="8163">Data.FingerTree.MonoidSolver</a>
+
+<a class="Comment" id="8193">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="8277">-- │                                                                              │</a>
+<a class="Comment" id="8361">-- │                                                                              │</a>
+<a class="Comment" id="8445">-- │                                                                              │</a>
+<a class="Comment" id="8529">-- │                                                                              │</a>
+<a class="Comment" id="8613">-- │                                                                              │</a>
+<a class="Comment" id="8697">-- │                   __  __                                                     │</a>
+<a class="Comment" id="8781">-- │                  |  \/  | ___  __ _ ___ _   _ _ __ ___  ___                  │</a>
+<a class="Comment" id="8865">-- │                  | |\/| |/ _ \/ _` / __| | | | '__/ _ \/ __|                 │</a>
+<a class="Comment" id="8949">-- │                  | |  | |  __/ (_| \__ \ |_| | | |  __/\__ \                 │</a>
+<a class="Comment" id="9033">-- │                  |_|  |_|\___|\__,_|___/\__,_|_|  \___||___/                 │</a>
+<a class="Comment" id="9117">-- │                                                                              │</a>
+<a class="Comment" id="9201">-- │                                                                              │</a>
+<a class="Comment" id="9285">-- │                                                                              │</a>
+<a class="Comment" id="9369">-- │                                                                              │</a>
+<a class="Comment" id="9453">-- │                                                                              │</a>
+<a class="Comment" id="9537">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+<a class="Comment" id="9621">--</a>
+<a class="Comment" id="9624">-- First things first, we need a way to talk about the summaries of elements we're</a>
+<a class="Comment" id="9707">-- interested in. This is captured by the σ class, which has one method μ.</a>
+
+<a class="Function" href="Data.FingerTree.html#9783" id="9783">_</a> <a class="Symbol" id="9785">:</a> <a class="Symbol" id="9787">∀</a> <a class="Symbol" id="9789">{</a><a class="Bound" href="Data.FingerTree.html#9790" id="9790">a</a><a class="Symbol" id="9791">}</a> <a class="Symbol" id="9793">{</a><a class="Bound" href="Data.FingerTree.html#9794" id="9794">A</a> <a class="Symbol" id="9796">:</a> <a class="PrimitiveType" id="9798">Set</a> <a class="Bound" href="Data.FingerTree.html#9790" id="9802">a</a><a class="Symbol" id="9803">}</a> <a class="Symbol" id="9805">⦃</a> <a class="Bound" href="Data.FingerTree.html#9807" id="9807">_</a> <a class="Symbol" id="9809">:</a> <a class="Record" href="Data.FingerTree.Measures.html#317" id="9811">σ</a> <a class="Bound" href="Data.FingerTree.html#9794" id="9813">A</a> <a class="Symbol" id="9815">⦄</a> <a class="Symbol" id="9817">→</a> <a class="Bound" href="Data.FingerTree.html#9794" id="9819">A</a> <a class="Symbol" id="9821">→</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.html#2603" id="9823">𝓡</a>
+<a class="Symbol" id="9825">_</a> <a class="Symbol" id="9827">=</a> <a class="Field" href="Data.FingerTree.Measures.html#361" id="9829">μ</a>
+
+<a class="Comment" id="9832">-- 𝓡 is the type of the summaries, and μ means "summarise". The silly symbols</a>
+<a class="Comment" id="9910">-- are used for brevity: we're going to be using this thing everywhere, so it's</a>
+<a class="Comment" id="9990">-- important to keep it short. Here's an example instance for lists:</a>
+
+<a class="Function" href="Data.FingerTree.html#10060" id="10060">_</a> <a class="Symbol" id="10062">:</a> <a class="Symbol" id="10064">(</a><a class="Bound" href="Data.FingerTree.html#10065" id="10065">xs</a> <a class="Symbol" id="10068">:</a> <a class="Datatype" href="https://agda.github.io/agda-stdlib/Agda.Builtin.List.html#80" id="10070">List</a> <a class="Field" href="Data.FingerTree.Preamble.html#509" id="10075">A</a><a class="Symbol" id="10076">)</a> <a class="Symbol" id="10078">→</a> <a class="Field" href="Data.FingerTree.Measures.html#361" id="10080">μ</a> <a class="Bound" href="Data.FingerTree.html#10065" id="10082">xs</a> <a class="Datatype Operator" href="https://agda.github.io/agda-stdlib/Agda.Builtin.Equality.html#83" id="10085">≡</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Data.List.Base.html#3600" id="10087">foldr</a> <a class="Symbol" id="10093">(</a><a class="Function Operator" href="https://agda.github.io/agda-stdlib/Algebra.html#2653" id="10094">_∙_</a> <a class="Function Operator" href="https://agda.github.io/agda-stdlib/Function.html#805" id="10098">∘</a> <a class="Field" href="Data.FingerTree.Measures.html#361" id="10100">μ</a><a class="Symbol" id="10101">)</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.html#2680" id="10103">ε</a> <a class="Bound" href="Data.FingerTree.html#10065" id="10105">xs</a>
+<a class="Symbol" id="10108">_</a> <a class="Symbol" id="10110">=</a> <a class="Symbol" id="10112">λ</a> <a class="Bound" href="Data.FingerTree.html#10114" id="10114">xs</a> <a class="Symbol" id="10117">→</a> <a class="InductiveConstructor" href="https://agda.github.io/agda-stdlib/Agda.Builtin.Equality.html#140" id="10119">refl</a>
+
+<a class="Comment" id="10125">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="10209">-- │                                                                              │</a>
+<a class="Comment" id="10293">-- │                                                                              │</a>
+<a class="Comment" id="10377">-- │        __        __         _    _                        _ _   _            │</a>
+<a class="Comment" id="10461">-- │        \ \      / /__  _ __| | _(_)_ __   __ _  __      _(_) |_| |__         │</a>
+<a class="Comment" id="10545">-- │         \ \ /\ / / _ \| '__| |/ / | '_ \ / _` | \ \ /\ / / | __| '_ \        │</a>
+<a class="Comment" id="10629">-- │          \ V  V / (_) | |  |   &lt;| | | | | (_| |  \ V  V /| | |_| | | |       │</a>
+<a class="Comment" id="10713">-- │           \_/\_/ \___/|_|  |_|\_\_|_| |_|\__, |   \_/\_/ |_|\__|_| |_|       │</a>
+<a class="Comment" id="10797">-- │                                          |___/                               │</a>
+<a class="Comment" id="10881">-- │                        ____       _        _     _                           │</a>
+<a class="Comment" id="10965">-- │                       / ___|  ___| |_ ___ (_) __| |___                       │</a>
+<a class="Comment" id="11049">-- │                       \___ \ / _ \ __/ _ \| |/ _` / __|                      │</a>
+<a class="Comment" id="11133">-- │                        ___) |  __/ || (_) | | (_| \__ \                      │</a>
+<a class="Comment" id="11217">-- │                       |____/ \___|\__\___/|_|\__,_|___/                      │</a>
+<a class="Comment" id="11301">-- │                                                                              │</a>
+<a class="Comment" id="11385">-- │                                                                              │</a>
+<a class="Comment" id="11469">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+
+<a class="Comment" id="11554">-- As I mentioned, the tree is going to be verified intrinsically. In other word</a>
+<a class="Comment" id="11635">-- its type will look something like this:</a>
+
+<a id="SimpleTree"></a><a class="Function" href="Data.FingerTree.html#11679" id="11679">SimpleTree</a> <a class="Symbol" id="11690">:</a> <a class="PrimitiveType" id="11692">Set</a> <a class="Symbol" id="11696">_</a>
+<a class="Function" href="Data.FingerTree.html#11679" id="11698">SimpleTree</a> <a class="Symbol" id="11709">=</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.html#2603" id="11711">𝓡</a> <a class="Symbol" id="11713">→</a> <a class="PrimitiveType" id="11715">Set</a>
+
+<a class="Comment" id="11720">-- But before running off to define that the obvious way, I should mention that I</a>
+<a class="Comment" id="11802">-- made the annoying decision to use a setoid (rather than propositional equality)</a>
+<a class="Comment" id="11885">-- based monoid. This means that we don't get substitution, making the obvious</a>
+<a class="Comment" id="11964">-- definition untenable.</a>
+
+<a class="Comment" id="11990">-- I figured out a solution to the problem, but I'm not sure if I'm happy with it.</a>
+<a class="Comment" id="12073">-- That's actually the main motivation for writing this post: I'm curious if other</a>
+<a class="Comment" id="12156">-- people have better techniques for this kind of thing.</a>
+
+<a class="Comment" id="12214">-- To clarify: "this kind of thing" is writing intrinsic (correct-by-construction)</a>
+<a class="Comment" id="12297">-- proofs when a setoid is involved. Intrinsic proofs usually lend themselves to</a>
+<a class="Comment" id="12378">-- elegance: to prove that `map` preserves a vector's length, for instance,</a>
+<a class="Comment" id="12454">-- basically requires no proof at all:</a>
+
+<a id="map"></a><a class="Function" href="Data.FingerTree.html#12494" id="12494">map</a> <a class="Symbol" id="12498">:</a> <a class="Symbol" id="12500">∀</a> <a class="Symbol" id="12502">{</a><a class="Bound" href="Data.FingerTree.html#12503" id="12503">a</a> <a class="Bound" href="Data.FingerTree.html#12505" id="12505">b</a> <a class="Bound" href="Data.FingerTree.html#12507" id="12507">n</a><a class="Symbol" id="12508">}</a> <a class="Symbol" id="12510">{</a><a class="Bound" href="Data.FingerTree.html#12511" id="12511">A</a> <a class="Symbol" id="12513">:</a> <a class="PrimitiveType" id="12515">Set</a> <a class="Bound" href="Data.FingerTree.html#12503" id="12519">a</a><a class="Symbol" id="12520">}</a> <a class="Symbol" id="12522">{</a><a class="Bound" href="Data.FingerTree.html#12523" id="12523">B</a> <a class="Symbol" id="12525">:</a> <a class="PrimitiveType" id="12527">Set</a> <a class="Bound" href="Data.FingerTree.html#12505" id="12531">b</a><a class="Symbol" id="12532">}</a>
+    <a class="Symbol" id="12538">→</a> <a class="Symbol" id="12540">(</a><a class="Bound" href="Data.FingerTree.html#12511" id="12541">A</a> <a class="Symbol" id="12543">→</a> <a class="Bound" href="Data.FingerTree.html#12523" id="12545">B</a><a class="Symbol" id="12546">)</a>
+    <a class="Symbol" id="12552">→</a> <a class="Datatype" href="https://agda.github.io/agda-stdlib/Data.Vec.html#773" id="12554">Vec</a> <a class="Bound" href="Data.FingerTree.html#12511" id="12558">A</a> <a class="Bound" href="Data.FingerTree.html#12507" id="12560">n</a>
+    <a class="Symbol" id="12566">→</a> <a class="Datatype" href="https://agda.github.io/agda-stdlib/Data.Vec.html#773" id="12568">Vec</a> <a class="Bound" href="Data.FingerTree.html#12523" id="12572">B</a> <a class="Bound" href="Data.FingerTree.html#12507" id="12574">n</a>
+<a class="Function" href="Data.FingerTree.html#12494" id="12576">map</a> <a class="Bound" href="Data.FingerTree.html#12580" id="12580">f</a> <a class="InductiveConstructor" href="https://agda.github.io/agda-stdlib/Data.Vec.html#813" id="12582">[]</a> <a class="Symbol" id="12585">=</a> <a class="InductiveConstructor" href="https://agda.github.io/agda-stdlib/Data.Vec.html#813" id="12587">[]</a>
+<a class="Function" href="Data.FingerTree.html#12494" id="12590">map</a> <a class="Bound" href="Data.FingerTree.html#12594" id="12594">f</a> <a class="Symbol" id="12596">(</a><a class="Bound" href="Data.FingerTree.html#12597" id="12597">x</a> <a class="InductiveConstructor Operator" href="https://agda.github.io/agda-stdlib/Data.Vec.html#832" id="12599">∷</a> <a class="Bound" href="Data.FingerTree.html#12601" id="12601">xs</a><a class="Symbol" id="12603">)</a> <a class="Symbol" id="12605">=</a> <a class="Bound" href="Data.FingerTree.html#12594" id="12607">f</a> <a class="Bound" href="Data.FingerTree.html#12597" id="12609">x</a> <a class="InductiveConstructor Operator" href="https://agda.github.io/agda-stdlib/Data.Vec.html#832" id="12611">∷</a> <a class="Function" href="Data.FingerTree.html#12494" id="12613">map</a> <a class="Bound" href="Data.FingerTree.html#12594" id="12617">f</a> <a class="Bound" href="Data.FingerTree.html#12601" id="12619">xs</a>
+
+<a class="Comment" id="12623">-- But that's because pattern matching works well with propositional equality: in</a>
+<a class="Comment" id="12705">-- the first clause, n is set to 0 automatically. If we were working with</a>
+<a class="Comment" id="12779">-- setoid equality, we'd instead maybe get a proof that n ≈ 0, and we'd have to</a>
+<a class="Comment" id="12859">-- figure a way to work that into the types.</a>
+
+<a class="Keyword" id="12905">open</a> <a class="Module" href="Data.FingerTree.html#2976" id="12910">Measures</a> <a class="Keyword" id="12919">hiding</a> <a class="Symbol" id="12926">(</a><a class="InductiveConstructor" href="Data.FingerTree.Measures.html#2635" id="12927">arg-syntax</a><a class="Symbol" id="12937">;</a> <a class="Function Operator" href="Data.FingerTree.Measures.html#3143" id="12939">_&gt;&gt;=_</a><a class="Symbol" id="12944">;</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="12946">μ⟨_⟩≈_</a><a class="Symbol" id="12952">;</a> <a class="Field" href="Data.FingerTree.Measures.html#744" id="12954">𝓢</a><a class="Symbol" id="12955">;</a> <a class="Field" href="Data.FingerTree.Measures.html#754" id="12957">𝒻</a><a class="Symbol" id="12958">;</a> <a class="Function Operator" href="Data.FingerTree.Measures.html#1444" id="12960">_≈[_]</a><a class="Symbol" id="12965">;</a> <a class="Record" href="Data.FingerTree.Measures.html#317" id="12967">σ</a><a class="Symbol" id="12968">;</a> <a class="Record" href="Data.FingerTree.Measures.html#2545" id="12970">Arg</a><a class="Symbol" id="12973">)</a>
+
+<a class="Comment" id="12976">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="13060">-- │                                                                              │</a>
+<a class="Comment" id="13144">-- │                                                                              │</a>
+<a class="Comment" id="13228">-- │                                                                              │</a>
+<a class="Comment" id="13312">-- │                                                                              │</a>
+<a class="Comment" id="13396">-- │                                                                              │</a>
+<a class="Comment" id="13480">-- │                          _____ _ _                                           │</a>
+<a class="Comment" id="13564">-- │                         |  ___(_) |__  _ __ ___  ___                         │</a>
+<a class="Comment" id="13648">-- │                         | |_  | | '_ \| '__/ _ \/ __|                        │</a>
+<a class="Comment" id="13732">-- │                         |  _| | | |_) | | |  __/\__ \                        │</a>
+<a class="Comment" id="13816">-- │                         |_|   |_|_.__/|_|  \___||___/                        │</a>
+<a class="Comment" id="13900">-- │                                                                              │</a>
+<a class="Comment" id="13984">-- │                                                                              │</a>
+<a class="Comment" id="14068">-- │                                                                              │</a>
+<a class="Comment" id="14152">-- │                                                                              │</a>
+<a class="Comment" id="14236">-- │                                                                              │</a>
+<a class="Comment" id="14320">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+
+<a class="Keyword" id="14405">module</a> <a id="Fibre"></a><a class="Module" href="Data.FingerTree.html#14412" id="14412">Fibre</a> <a class="Keyword" id="14418">where</a>
+
+<a class="Comment" id="14425">-- The first part of the solution is to define a wrapper type which stores</a>
+<a class="Comment" id="14500">-- information about the size of the thing it contains:</a>
+
+ <a class="Keyword" id="14558">record</a> <a id="Fibre.μ⟨_⟩≈_"></a><a class="Record Operator" href="Data.FingerTree.html#14565" id="14565">μ⟨_⟩≈_</a> <a class="Symbol" id="14572">{</a><a class="Bound" href="Data.FingerTree.html#14573" id="14573">a</a><a class="Symbol" id="14574">}</a> <a class="Symbol" id="14576">(</a><a class="Bound" href="Data.FingerTree.html#14577" id="14577">Σ</a> <a class="Symbol" id="14579">:</a> <a class="PrimitiveType" id="14581">Set</a> <a class="Bound" href="Data.FingerTree.html#14573" id="14585">a</a><a class="Symbol" id="14586">)</a> <a class="Symbol" id="14588">⦃</a> <a class="Bound" href="Data.FingerTree.html#14590" id="14590">_</a> <a class="Symbol" id="14592">:</a> <a class="Record" href="Data.FingerTree.Measures.html#317" id="14594">σ</a> <a class="Bound" href="Data.FingerTree.html#14577" id="14596">Σ</a> <a class="Symbol" id="14598">⦄</a> <a class="Symbol" id="14600">(</a><a class="Bound" href="Data.FingerTree.html#14601" id="14601">𝓂</a> <a class="Symbol" id="14603">:</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.html#2603" id="14605">𝓡</a><a class="Symbol" id="14606">)</a> <a class="Symbol" id="14608">:</a> <a class="PrimitiveType" id="14610">Set</a> <a class="Symbol" id="14614">(</a><a class="Bound" href="Data.FingerTree.html#14573" id="14615">a</a> <a class="Primitive Operator" href="https://agda.github.io/agda-stdlib/Agda.Primitive.html#657" id="14617">⊔</a> <a class="Bound" href="Data.FingerTree.html#2872" id="14619">c</a> <a class="Primitive Operator" href="https://agda.github.io/agda-stdlib/Agda.Primitive.html#657" id="14621">⊔</a> <a class="Bound" href="Data.FingerTree.html#2874" id="14623">m</a><a class="Symbol" id="14624">)</a> <a class="Keyword" id="14626">where</a>
+   <a class="Keyword" id="14635">constructor</a> <a id="Fibre.μ⟨_⟩≈_._⇑[_]"></a><a class="InductiveConstructor Operator" href="Data.FingerTree.html#14647" id="14647">_⇑[_]</a>
+   <a class="Keyword" id="14656">field</a>
+     <a id="Fibre.μ⟨_⟩≈_.𝓢"></a><a class="Field" href="Data.FingerTree.html#14667" id="14667">𝓢</a> <a class="Symbol" id="14669">:</a> <a class="Bound" href="Data.FingerTree.html#14577" id="14671">Σ</a>
+     <a id="Fibre.μ⟨_⟩≈_.𝒻"></a><a class="Field" href="Data.FingerTree.html#14678" id="14678">𝒻</a> <a class="Symbol" id="14680">:</a> <a class="Field" href="Data.FingerTree.Measures.html#361" id="14682">μ</a> <a class="Field" href="Data.FingerTree.html#14667" id="14684">𝓢</a> <a class="Function Operator" href="https://agda.github.io/agda-stdlib/Algebra.html#2624" id="14686">≈</a> <a class="Bound" href="Data.FingerTree.html#14601" id="14688">𝓂</a>
+ <a class="Keyword" id="14691">open</a> <a class="Module Operator" href="Data.FingerTree.html#14565" id="14696">μ⟨_⟩≈_</a>
+
+<a class="Comment" id="14704">-- Technically speaking, I think this is known as a "fibre". μ⟨ Σ ⟩≈ 𝓂 means "There</a>
+<a class="Comment" id="14788">-- exists a Σ such that μ Σ ≈ 𝓂". Next, we'll need some combinators to work</a>
+<a class="Comment" id="14864">-- with:</a>
+
+ <a class="Keyword" id="14875">infixl</a> <a class="Number" id="14882">2</a> <a class="Function Operator" href="Data.FingerTree.html#14891" id="14884">_≈[_]</a>
+ <a id="Fibre._≈[_]"></a><a class="Function Operator" href="Data.FingerTree.html#14891" id="14891">_≈[_]</a> <a class="Symbol" id="14897">:</a> <a class="Symbol" id="14899">∀</a> <a class="Symbol" id="14901">{</a><a class="Bound" href="Data.FingerTree.html#14902" id="14902">a</a><a class="Symbol" id="14903">}</a> <a class="Symbol" id="14905">{</a><a class="Bound" href="Data.FingerTree.html#14906" id="14906">Σ</a> <a class="Symbol" id="14908">:</a> <a class="PrimitiveType" id="14910">Set</a> <a class="Bound" href="Data.FingerTree.html#14902" id="14914">a</a><a class="Symbol" id="14915">}</a> <a class="Symbol" id="14917">⦃</a> <a class="Bound" href="Data.FingerTree.html#14919" id="14919">_</a> <a class="Symbol" id="14921">:</a> <a class="Record" href="Data.FingerTree.Measures.html#317" id="14923">σ</a> <a class="Bound" href="Data.FingerTree.html#14906" id="14925">Σ</a> <a class="Symbol" id="14927">⦄</a> <a class="Symbol" id="14929">{</a><a class="Bound" href="Data.FingerTree.html#14930" id="14930">x</a> <a class="Symbol" id="14932">:</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.html#2603" id="14934">𝓡</a><a class="Symbol" id="14935">}</a> <a class="Symbol" id="14937">→</a> <a class="Record Operator" href="Data.FingerTree.html#14565" id="14939">μ⟨</a> <a class="Bound" href="Data.FingerTree.html#14906" id="14942">Σ</a> <a class="Record Operator" href="Data.FingerTree.html#14565" id="14944">⟩≈</a> <a class="Bound" href="Data.FingerTree.html#14930" id="14947">x</a> <a class="Symbol" id="14949">→</a> <a class="Symbol" id="14951">∀</a> <a class="Symbol" id="14953">{</a><a class="Bound" href="Data.FingerTree.html#14954" id="14954">y</a><a class="Symbol" id="14955">}</a> <a class="Symbol" id="14957">→</a> <a class="Bound" href="Data.FingerTree.html#14930" id="14959">x</a> <a class="Function Operator" href="https://agda.github.io/agda-stdlib/Algebra.html#2624" id="14961">≈</a> <a class="Bound" href="Data.FingerTree.html#14954" id="14963">y</a> <a class="Symbol" id="14965">→</a> <a class="Record Operator" href="Data.FingerTree.html#14565" id="14967">μ⟨</a> <a class="Bound" href="Data.FingerTree.html#14906" id="14970">Σ</a> <a class="Record Operator" href="Data.FingerTree.html#14565" id="14972">⟩≈</a> <a class="Bound" href="Data.FingerTree.html#14954" id="14975">y</a>
+ <a class="Field" href="Data.FingerTree.html#14667" id="14978">𝓢</a> <a class="Symbol" id="14980">(</a><a class="Bound" href="Data.FingerTree.html#14981" id="14981">xs</a> <a class="Function Operator" href="Data.FingerTree.html#14891" id="14984">≈[</a> <a class="Bound" href="Data.FingerTree.html#14987" id="14987">y≈z</a> <a class="Function Operator" href="Data.FingerTree.html#14891" id="14991">]</a><a class="Symbol" id="14992">)</a> <a class="Symbol" id="14994">=</a> <a class="Field" href="Data.FingerTree.html#14667" id="14996">𝓢</a> <a class="Bound" href="Data.FingerTree.html#14981" id="14998">xs</a>
+ <a class="Field" href="Data.FingerTree.html#14678" id="15002">𝒻</a> <a class="Symbol" id="15004">(</a><a class="Bound" href="Data.FingerTree.html#15005" id="15005">xs</a> <a class="Function Operator" href="Data.FingerTree.html#14891" id="15008">≈[</a> <a class="Bound" href="Data.FingerTree.html#15011" id="15011">y≈z</a> <a class="Function Operator" href="Data.FingerTree.html#14891" id="15015">]</a><a class="Symbol" id="15016">)</a> <a class="Symbol" id="15018">=</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Relation.Binary.Core.html#5860" id="15020">trans</a> <a class="Symbol" id="15026">(</a><a class="Field" href="Data.FingerTree.html#14678" id="15027">𝒻</a> <a class="Bound" href="Data.FingerTree.html#15005" id="15029">xs</a><a class="Symbol" id="15031">)</a> <a class="Bound" href="Data.FingerTree.html#15011" id="15033">y≈z</a>
+
+<a class="Comment" id="15038">-- This makes it possible to "rewrite" the summary, given a proof of equivalence.</a>
+
+<a class="Keyword" id="15121">open</a> <a class="Module" href="Data.FingerTree.html#2976" id="15126">Measures</a> <a class="Keyword" id="15135">using</a> <a class="Symbol" id="15141">(</a><a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="15142">μ⟨_⟩≈_</a><a class="Symbol" id="15148">;</a> <a class="Field" href="Data.FingerTree.Measures.html#744" id="15150">𝓢</a><a class="Symbol" id="15151">;</a> <a class="Field" href="Data.FingerTree.Measures.html#754" id="15153">𝒻</a><a class="Symbol" id="15154">;</a> <a class="Function Operator" href="Data.FingerTree.Measures.html#1444" id="15156">_≈[_]</a><a class="Symbol" id="15161">)</a>
+<a class="Comment" id="15163">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="15247">-- │                                                                              │</a>
+<a class="Comment" id="15331">-- │                                                                              │</a>
+<a class="Comment" id="15415">-- │                                                                              │</a>
+<a class="Comment" id="15499">-- │                                                                              │</a>
+<a class="Comment" id="15583">-- │                                                                              │</a>
+<a class="Comment" id="15667">-- │             ____          _   _       _        _   _                         │</a>
+<a class="Comment" id="15751">-- │            |  _ \  ___   | \ | | ___ | |_ __ _| |_(_) ___  _ __              │</a>
+<a class="Comment" id="15835">-- │            | | | |/ _ \  |  \| |/ _ \| __/ _` | __| |/ _ \| '_ \             │</a>
+<a class="Comment" id="15919">-- │            | |_| | (_) | | |\  | (_) | || (_| | |_| | (_) | | | |            │</a>
+<a class="Comment" id="16003">-- │            |____/ \___/  |_| \_|\___/ \__\__,_|\__|_|\___/|_| |_|            │</a>
+<a class="Comment" id="16087">-- │                                                                              │</a>
+<a class="Comment" id="16171">-- │                                                                              │</a>
+<a class="Comment" id="16255">-- │                                                                              │</a>
+<a class="Comment" id="16339">-- │                                                                              │</a>
+<a class="Comment" id="16423">-- │                                                                              │</a>
+<a class="Comment" id="16507">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+<a class="Keyword" id="16591">module</a> <a id="ArgSyntax"></a><a class="Module" href="Data.FingerTree.html#16598" id="16598">ArgSyntax</a> <a class="Keyword" id="16608">where</a>
+
+<a class="Comment" id="16615">-- The wrapper on its own isn't enough to save us from hundreds of lines of proofs.</a>
+<a class="Comment" id="16699">-- Once you do computation on its contents, you still need to join it up with its</a>
+<a class="Comment" id="16781">-- original proof of equivalence. In other words, you'll need to drill into the</a>
+<a class="Comment" id="16861">-- return type of a function, find the place you used the relevant type variable,</a>
+<a class="Comment" id="16943">-- and apply the relevant proof from the type above. This can really clutter</a>
+<a class="Comment" id="17020">-- proofs. Instead, we can use Agda's new support for do notation to try and get a</a>
+<a class="Comment" id="17103">-- cleaner notation for everything. Here's a big block of code:</a>
+ <a class="Keyword" id="17168">infixl</a> <a class="Number" id="17175">2</a> <a class="InductiveConstructor" href="Data.FingerTree.html#17287" id="17177">arg-syntax</a>
+ <a class="Keyword" id="17189">record</a> <a id="ArgSyntax.Arg"></a><a class="Record" href="Data.FingerTree.html#17196" id="17196">Arg</a> <a class="Symbol" id="17200">{</a><a class="Bound" href="Data.FingerTree.html#17201" id="17201">a</a><a class="Symbol" id="17202">}</a> <a class="Symbol" id="17204">(</a><a class="Bound" href="Data.FingerTree.html#17205" id="17205">Σ</a> <a class="Symbol" id="17207">:</a> <a class="PrimitiveType" id="17209">Set</a> <a class="Bound" href="Data.FingerTree.html#17201" id="17213">a</a><a class="Symbol" id="17214">)</a> <a class="Symbol" id="17216">⦃</a> <a class="Bound" href="Data.FingerTree.html#17218" id="17218">_</a> <a class="Symbol" id="17220">:</a> <a class="Record" href="Data.FingerTree.Measures.html#317" id="17222">σ</a> <a class="Bound" href="Data.FingerTree.html#17205" id="17224">Σ</a> <a class="Symbol" id="17226">⦄</a> <a class="Symbol" id="17228">(</a><a class="Bound" href="Data.FingerTree.html#17229" id="17229">𝓂</a> <a class="Symbol" id="17231">:</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.html#2603" id="17233">𝓡</a><a class="Symbol" id="17234">)</a> <a class="Symbol" id="17236">(</a><a class="Bound" href="Data.FingerTree.html#17237" id="17237">f</a> <a class="Symbol" id="17239">:</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.html#2603" id="17241">𝓡</a> <a class="Symbol" id="17243">→</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.html#2603" id="17245">𝓡</a><a class="Symbol" id="17246">)</a> <a class="Symbol" id="17248">:</a> <a class="PrimitiveType" id="17250">Set</a> <a class="Symbol" id="17254">(</a><a class="Bound" href="Data.FingerTree.html#2874" id="17255">m</a> <a class="Primitive Operator" href="https://agda.github.io/agda-stdlib/Agda.Primitive.html#657" id="17257">⊔</a> <a class="Bound" href="Data.FingerTree.html#2872" id="17259">c</a> <a class="Primitive Operator" href="https://agda.github.io/agda-stdlib/Agda.Primitive.html#657" id="17261">⊔</a> <a class="Bound" href="Data.FingerTree.html#17201" id="17263">a</a><a class="Symbol" id="17264">)</a> <a class="Keyword" id="17266">where</a>
+   <a class="Keyword" id="17275">constructor</a> <a id="ArgSyntax.Arg.arg-syntax"></a><a class="InductiveConstructor" href="Data.FingerTree.html#17287" id="17287">arg-syntax</a>
+   <a class="Keyword" id="17301">field</a>
+     <a id="ArgSyntax.Arg.⟨f⟩"></a><a class="Field" href="Data.FingerTree.html#17312" id="17312">⟨f⟩</a> <a class="Symbol" id="17316">:</a> <a class="Function" href="https://agda.github.io/agda-stdlib/Algebra.FunctionProperties.html#2790" id="17318">Congruent₁</a> <a class="Bound" href="Data.FingerTree.html#17237" id="17329">f</a>
+     <a id="ArgSyntax.Arg.arg"></a><a class="Field" href="Data.FingerTree.html#17336" id="17336">arg</a> <a class="Symbol" id="17340">:</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="17342">μ⟨</a> <a class="Bound" href="Data.FingerTree.html#17205" id="17345">Σ</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="17347">⟩≈</a> <a class="Bound" href="Data.FingerTree.html#17229" id="17350">𝓂</a>
+ <a class="Keyword" id="17353">open</a> <a class="Module" href="Data.FingerTree.html#17196" id="17358">Arg</a>
+
+ <a class="Keyword" id="17364">syntax</a> <a class="InductiveConstructor" href="Data.FingerTree.html#17287" id="17371">arg-syntax</a> <a class="Symbol" id="17382">(λ</a> sz <a class="Symbol" id="17388">→</a> e₁<a class="Symbol" id="17392">)</a> xs <a class="Symbol" id="17397">=</a> xs [ e₁ ⟿ sz ]
+
+ <a class="Keyword" id="17416">infixl</a> <a class="Number" id="17423">1</a> <a class="Function Operator" href="Data.FingerTree.html#17432" id="17425">_&gt;&gt;=_</a>
+ <a id="ArgSyntax._&gt;&gt;=_"></a><a class="Function Operator" href="Data.FingerTree.html#17432" id="17432">_&gt;&gt;=_</a> <a class="Symbol" id="17438">:</a> <a class="Symbol" id="17440">∀</a> <a class="Symbol" id="17442">{</a><a class="Bound" href="Data.FingerTree.html#17443" id="17443">a</a> <a class="Bound" href="Data.FingerTree.html#17445" id="17445">b</a><a class="Symbol" id="17446">}</a> <a class="Symbol" id="17448">{</a><a class="Bound" href="Data.FingerTree.html#17449" id="17449">Σ₁</a> <a class="Symbol" id="17452">:</a> <a class="PrimitiveType" id="17454">Set</a> <a class="Bound" href="Data.FingerTree.html#17443" id="17458">a</a><a class="Symbol" id="17459">}</a> <a class="Symbol" id="17461">{</a><a class="Bound" href="Data.FingerTree.html#17462" id="17462">Σ₂</a> <a class="Symbol" id="17465">:</a> <a class="PrimitiveType" id="17467">Set</a> <a class="Bound" href="Data.FingerTree.html#17445" id="17471">b</a><a class="Symbol" id="17472">}</a> <a class="Symbol" id="17474">⦃</a> <a class="Bound" href="Data.FingerTree.html#17476" id="17476">_</a> <a class="Symbol" id="17478">:</a> <a class="Record" href="Data.FingerTree.Measures.html#317" id="17480">σ</a> <a class="Bound" href="Data.FingerTree.html#17449" id="17482">Σ₁</a> <a class="Symbol" id="17485">⦄</a> <a class="Symbol" id="17487">⦃</a> <a class="Bound" href="Data.FingerTree.html#17489" id="17489">_</a> <a class="Symbol" id="17491">:</a> <a class="Record" href="Data.FingerTree.Measures.html#317" id="17493">σ</a> <a class="Bound" href="Data.FingerTree.html#17462" id="17495">Σ₂</a> <a class="Symbol" id="17498">⦄</a> <a class="Symbol" id="17500">{</a><a class="Bound" href="Data.FingerTree.html#17501" id="17501">𝓂</a> <a class="Bound" href="Data.FingerTree.html#17503" id="17503">f</a><a class="Symbol" id="17504">}</a>
+       <a class="Symbol" id="17513">→</a> <a class="Record" href="Data.FingerTree.html#17196" id="17515">Arg</a> <a class="Bound" href="Data.FingerTree.html#17449" id="17519">Σ₁</a> <a class="Bound" href="Data.FingerTree.html#17501" id="17522">𝓂</a> <a class="Bound" href="Data.FingerTree.html#17503" id="17524">f</a>
+       <a class="Symbol" id="17533">→</a> <a class="Symbol" id="17535">((</a><a class="Bound" href="Data.FingerTree.html#17537" id="17537">x</a> <a class="Symbol" id="17539">:</a> <a class="Bound" href="Data.FingerTree.html#17449" id="17541">Σ₁</a><a class="Symbol" id="17543">)</a> <a class="Symbol" id="17545">→</a> <a class="Symbol" id="17547">⦃</a> <a class="Bound" href="Data.FingerTree.html#17549" id="17549">x≈</a> <a class="Symbol" id="17552">:</a> <a class="Field" href="Data.FingerTree.Measures.html#361" id="17554">μ</a> <a class="Bound" href="Data.FingerTree.html#17537" id="17556">x</a> <a class="Function Operator" href="https://agda.github.io/agda-stdlib/Algebra.html#2624" id="17558">≈</a> <a class="Bound" href="Data.FingerTree.html#17501" id="17560">𝓂</a> <a class="Symbol" id="17562">⦄</a> <a class="Symbol" id="17564">→</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="17566">μ⟨</a> <a class="Bound" href="Data.FingerTree.html#17462" id="17569">Σ₂</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="17572">⟩≈</a> <a class="Bound" href="Data.FingerTree.html#17503" id="17575">f</a> <a class="Symbol" id="17577">(</a><a class="Field" href="Data.FingerTree.Measures.html#361" id="17578">μ</a> <a class="Bound" href="Data.FingerTree.html#17537" id="17580">x</a><a class="Symbol" id="17581">))</a>
+       <a class="Symbol" id="17591">→</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="17593">μ⟨</a> <a class="Bound" href="Data.FingerTree.html#17462" id="17596">Σ₂</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="17599">⟩≈</a> <a class="Bound" href="Data.FingerTree.html#17503" id="17602">f</a> <a class="Bound" href="Data.FingerTree.html#17501" id="17604">𝓂</a>
+ <a class="InductiveConstructor" href="Data.FingerTree.html#17287" id="17607">arg-syntax</a> <a class="Bound" href="Data.FingerTree.html#17618" id="17618">cng</a> <a class="Bound" href="Data.FingerTree.html#17622" id="17622">xs</a> <a class="Function Operator" href="Data.FingerTree.html#17432" id="17625">&gt;&gt;=</a> <a class="Bound" href="Data.FingerTree.html#17629" id="17629">k</a> <a class="Symbol" id="17631">=</a> <a class="Bound" href="Data.FingerTree.html#17629" id="17633">k</a> <a class="Symbol" id="17635">(</a><a class="Field" href="Data.FingerTree.Measures.html#744" id="17636">𝓢</a> <a class="Bound" href="Data.FingerTree.html#17622" id="17638">xs</a><a class="Symbol" id="17640">)</a> <a class="Symbol" id="17642">⦃</a> <a class="Field" href="Data.FingerTree.Measures.html#754" id="17644">𝒻</a> <a class="Bound" href="Data.FingerTree.html#17622" id="17646">xs</a> <a class="Symbol" id="17649">⦄</a> <a class="Function Operator" href="Data.FingerTree.Measures.html#1444" id="17651">≈[</a> <a class="Bound" href="Data.FingerTree.html#17618" id="17654">cng</a> <a class="Symbol" id="17658">(</a><a class="Field" href="Data.FingerTree.Measures.html#754" id="17659">𝒻</a> <a class="Bound" href="Data.FingerTree.html#17622" id="17661">xs</a><a class="Symbol" id="17663">)</a> <a class="Function Operator" href="Data.FingerTree.Measures.html#1444" id="17665">]</a>
+
+<a class="Comment" id="17668">-- First, we define a wrapper for types parameterised by their summary, with a way</a>
+<a class="Comment" id="17751">-- to lift an underlying equality up into some expression f. The &gt;&gt;= operator</a>
+<a class="Comment" id="17829">-- just connects up all of the relevant bits. An example is what's needed:</a>
+
+<a class="Keyword" id="17905">open</a> <a class="Module" href="Data.FingerTree.html#2976" id="17910">Measures</a> <a class="Keyword" id="17919">using</a> <a class="Symbol" id="17925">(</a><a class="InductiveConstructor" href="Data.FingerTree.Measures.html#2635" id="17926">arg-syntax</a><a class="Symbol" id="17936">;</a> <a class="Function Operator" href="Data.FingerTree.Measures.html#3143" id="17938">_&gt;&gt;=_</a><a class="Symbol" id="17943">)</a>
+
+<a id="listToTree"></a><a class="Function" href="Data.FingerTree.html#17946" id="17946">listToTree</a> <a class="Symbol" id="17957">:</a> <a class="Symbol" id="17959">∀</a> <a class="Symbol" id="17961">{</a><a class="Bound" href="Data.FingerTree.html#17962" id="17962">a</a><a class="Symbol" id="17963">}</a> <a class="Symbol" id="17965">{</a><a class="Bound" href="Data.FingerTree.html#17966" id="17966">Σ</a> <a class="Symbol" id="17968">:</a> <a class="PrimitiveType" id="17970">Set</a> <a class="Bound" href="Data.FingerTree.html#17962" id="17974">a</a><a class="Symbol" id="17975">}</a> <a class="Symbol" id="17977">⦃</a> <a class="Bound" href="Data.FingerTree.html#17979" id="17979">_</a> <a class="Symbol" id="17981">:</a> <a class="Record" href="Data.FingerTree.Measures.html#317" id="17983">σ</a> <a class="Bound" href="Data.FingerTree.html#17966" id="17985">Σ</a> <a class="Symbol" id="17987">⦄</a> <a class="Symbol" id="17989">→</a> <a class="Symbol" id="17991">(</a><a class="Bound" href="Data.FingerTree.html#17992" id="17992">xs</a> <a class="Symbol" id="17995">:</a> <a class="Datatype" href="https://agda.github.io/agda-stdlib/Agda.Builtin.List.html#80" id="17997">List</a> <a class="Bound" href="Data.FingerTree.html#17966" id="18002">Σ</a><a class="Symbol" id="18003">)</a> <a class="Symbol" id="18005">→</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="18007">μ⟨</a> <a class="Datatype" href="Data.FingerTree.Structures.html#1236" id="18010">Tree</a> <a class="Bound" href="Data.FingerTree.html#17966" id="18015">Σ</a> <a class="Record Operator" href="Data.FingerTree.Measures.html#645" id="18017">⟩≈</a> <a class="Field" href="Data.FingerTree.Measures.html#361" id="18020">μ</a> <a class="Bound" href="Data.FingerTree.html#17992" id="18022">xs</a>
+<a class="Function" href="Data.FingerTree.html#17946" id="18025">listToTree</a> <a class="InductiveConstructor" href="https://agda.github.io/agda-stdlib/Agda.Builtin.List.html#117" id="18036">[]</a> <a class="Symbol" id="18039">=</a> <a class="InductiveConstructor" href="Data.FingerTree.Structures.html#1297" id="18041">empty</a> <a class="Function Operator" href="Data.FingerTree.Measures.html#872" id="18047">⇑</a>
+<a class="Function" href="Data.FingerTree.html#17946" id="18049">listToTree</a> <a class="Symbol" id="18060">(</a><a class="Bound" href="Data.FingerTree.html#18061" id="18061">x</a> <a class="InductiveConstructor Operator" href="https://agda.github.io/agda-stdlib/Agda.Builtin.List.html#132" id="18063">∷</a> <a class="Bound" href="Data.FingerTree.html#18065" id="18065">xs</a><a class="Symbol" id="18067">)</a> <a class="Symbol" id="18069">=</a> <a class="Function" href="Data.FingerTree.Measures.html#1833" id="18071">[</a> <a class="Field" href="Data.FingerTree.Preamble.html#421" id="18073">ℳ</a> <a class="Macro Operator" href="Data.FingerTree.Reasoning.html#311" id="18075">↯</a> <a class="Function" href="Data.FingerTree.Measures.html#1833" id="18077">]≈</a> <a class="Keyword" id="18080">do</a>
+  <a class="Bound" href="Data.FingerTree.html#18085" id="18085">ys</a> <a class="Function Operator" href="Data.FingerTree.Measures.html#3143" id="18088">←</a> <a class="Function" href="Data.FingerTree.html#17946" id="18090">listToTree</a> <a class="Bound" href="Data.FingerTree.html#18065" id="18101">xs</a> <a class="InductiveConstructor" href="Data.FingerTree.Measures.html#2635" id="18104">[</a> <a class="Field" href="Data.FingerTree.Measures.html#361" id="18106">μ</a> <a class="Bound" href="Data.FingerTree.html#18061" id="18108">x</a> <a class="Function Operator" href="Data.FingerTree.Reasoning.html#973" id="18110">∙&gt;</a> <a class="Bound" href="Data.FingerTree.html#18117" id="18113">s</a> <a class="InductiveConstructor" href="Data.FingerTree.Measures.html#2635" id="18115">⟿</a> <a class="Bound" href="Data.FingerTree.html#18117" id="18117">s</a> <a class="InductiveConstructor" href="Data.FingerTree.Measures.html#2635" id="18119">]</a>
+  <a class="Bound" href="Data.FingerTree.html#18061" id="18123">x</a> <a class="Function Operator" href="Data.FingerTree.Cons.html#447" id="18125">◂</a> <a class="Bound" href="Data.FingerTree.html#18085" id="18127">ys</a>
+
+<a class="Comment" id="18131">-- The first line is the base case, nothing interesting going on there. The second</a>
+<a class="Comment" id="18214">-- line begins the do-notation, but first applies [ ℳ ↯ ]≈: this calls the</a>
+<a class="Comment" id="18289">-- automated solver. The second line makes the recursive call, and with the syntax:</a>
+<a class="Comment" id="18373">--</a>
+<a class="Comment" id="18376">--   [ μ x ∙&gt; s ⟿ s ]</a>
+<a class="Comment" id="18398">--</a>
+<a class="Comment" id="18401">-- It tells us where the size of the bound variable will end up in the outer</a>
+<a class="Comment" id="18478">-- expression.</a>
+
+<a class="Comment" id="18494">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="18578">-- │                                                                              │</a>
+<a class="Comment" id="18662">-- │                                                                              │</a>
+<a class="Comment" id="18746">-- │                                                                              │</a>
+<a class="Comment" id="18830">-- │                                                                              │</a>
+<a class="Comment" id="18914">-- │                                                                              │</a>
+<a class="Comment" id="18998">-- │                     __  __           _       _                               │</a>
+<a class="Comment" id="19082">-- │                    |  \/  | ___   __| |_   _| | ___  ___                     │</a>
+<a class="Comment" id="19166">-- │                    | |\/| |/ _ \ / _` | | | | |/ _ \/ __|                    │</a>
+<a class="Comment" id="19250">-- │                    | |  | | (_) | (_| | |_| | |  __/\__ \                    │</a>
+<a class="Comment" id="19334">-- │                    |_|  |_|\___/ \__,_|\__,_|_|\___||___/                    │</a>
+<a class="Comment" id="19418">-- │                                                                              │</a>
+<a class="Comment" id="19502">-- │                                                                              │</a>
+<a class="Comment" id="19586">-- │                                                                              │</a>
+<a class="Comment" id="19670">-- │                                                                              │</a>
+<a class="Comment" id="19754">-- │                                                                              │</a>
+<a class="Comment" id="19838">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+
+<a class="Comment" id="19923">-- Definition of Measures and so on</a>
+<a class="Keyword" id="19959">import</a> <a class="Module" href="Data.FingerTree.Measures.html" id="19966">Data.FingerTree.Measures</a>
+
+<a class="Comment" id="19992">-- Tools for writing proofs</a>
+<a class="Keyword" id="20020">import</a> <a class="Module" href="Data.FingerTree.Reasoning.html" id="20027">Data.FingerTree.Reasoning</a>
+
+<a class="Comment" id="20054">-- The finger tree type</a>
+<a class="Keyword" id="20078">import</a> <a class="Module" href="Data.FingerTree.Structures.html" id="20085">Data.FingerTree.Structures</a>
+
+<a class="Comment" id="20113">-- Cons and Snoc</a>
+<a class="Keyword" id="20130">import</a> <a class="Module" href="Data.FingerTree.Cons.html" id="20137">Data.FingerTree.Cons</a>
+
+<a class="Comment" id="20159">-- Uncons and Unsnoc</a>
+<a class="Keyword" id="20180">import</a> <a class="Module" href="Data.FingerTree.View.html" id="20187">Data.FingerTree.View</a>
+
+<a class="Comment" id="20209">-- Split</a>
+<a class="Keyword" id="20218">import</a> <a class="Module" href="Data.FingerTree.Split.html" id="20225">Data.FingerTree.Split</a>
+
+<a class="Comment" id="20248">-- ┌──────────────────────────────────────────────────────────────────────────────┐</a>
+<a class="Comment" id="20332">-- │                    ___      __                                               │</a>
+<a class="Comment" id="20416">-- │                   | _ \___ / _|___ _ _ ___ _ _  __ ___ ___                   │</a>
+<a class="Comment" id="20500">-- │                   |   / -_)  _/ -_) '_/ -_) ' \/ _/ -_|_-&lt;                   │</a>
+<a class="Comment" id="20584">-- │                   |_|_\___|_| \___|_| \___|_||_\__\___/__/                   │</a>
+<a class="Comment" id="20668">-- │                                                                              │</a>
+<a class="Comment" id="20752">-- └──────────────────────────────────────────────────────────────────────────────┘</a>
+
+<a class="Comment" id="20837">-- [1]</a>
+<a class="Comment" id="20844">-- Mu, Shin-Cheng, Yu-Hsi Chiang, and Yu-Han Lyu. 2016. “Queueing and Glueing for</a>
+<a class="Comment" id="20926">-- Optimal Partitioning (Functional Pearl).” In Proceedings of the 21st ACM SIGPLAN</a>
+<a class="Comment" id="21010">-- International Conference on Functional Programming, 158–167. ICFP 2016. New</a>
+<a class="Comment" id="21089">-- York, NY, USA: ACM. doi:10.1145/2951913.2951923.</a>
+<a class="Comment" id="21141">-- https://www.iis.sinica.edu.tw/~scm/pub/queueing-glueing.pdf.</a>
+
+<a class="Comment" id="21206">-- [2]</a>
+<a class="Comment" id="21213">-- Hinze, Ralf, and Ross Paterson. 2006. “Finger Trees: A Simple General-purpose</a>
+<a class="Comment" id="21294">-- Data Structure.” Journal of Functional Programming 16 (2): 197–217.</a>
+<a class="Comment" id="21365">-- http://www.staff.city.ac.uk/~ross/papers/FingerTree.html.</a>
+
+<a class="Comment" id="21427">-- [3]</a>
+<a class="Comment" id="21434">-- Hinze, Ralf. 2001. “A Simple Implementation Technique for Priority Search</a>
+<a class="Comment" id="21511">-- Queues.” In Proceedings of the 2001 International Conference on Functional</a>
+<a class="Comment" id="21589">-- Programming, 110–121. ACM Press. doi:10.1145/507635.507650.</a>
+<a class="Comment" id="21652">-- https://www.cs.ox.ac.uk/people/ralf.hinze/publications/\#P14.</a>
+
+<a class="Comment" id="21718">-- [4]</a>
+<a class="Comment" id="21725">-- Sozeau, Matthieu. 2007. “Program-ing Finger Trees in Coq.” In Proceedings of the</a>
+<a class="Comment" id="21809">-- 12th ACM SIGPLAN International Conference on Functional Programming, 13–24. ICFP</a>
+<a class="Comment" id="21893">-- ’07. New York, NY, USA: ACM. doi:10.1145/1291151.1291156.</a>
+<a class="Comment" id="21954">-- https://www.irif.fr/~sozeau/research/publications/Program-ing_Finger_Trees_in_Coq.pdf.</a>
+
+<a class="Comment" id="22045">-- [5]</a>
+<a class="Comment" id="22052">-- Danielsson, Nils Anders. 2008. “Lightweight Semiformal Time Complexity Analysis</a>
+<a class="Comment" id="22135">-- for Purely Functional Data Structures.” In Proceedings of the 35th Annual ACM</a>
+<a class="Comment" id="22216">-- SIGPLAN-SIGACT Symposium on Principles of Programming Languages, 133–144. POPL</a>
+<a class="Comment" id="22298">-- ’08. New York, NY, USA: ACM. doi:10.1145/1328438.1328457.</a>
+<a class="Comment" id="22359">-- http://www.cse.chalmers.se/~nad/publications/danielsson-popl2008.pdf.</a>
+
+
+
+</pre></body></html>
