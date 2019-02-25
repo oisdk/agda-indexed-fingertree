@@ -128,27 +128,19 @@ module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
   splitDigit i xs s = digitToList xs [ _ ∙> sz ⟿ sz ] >>= λ ys → splitList i ys (s ≈▻⟅ sym (_ ≈? _) ⟆)
 
 
-  -- splitTree-l : ∀ i → ¬ ℙ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫)  → (rs : Digit Σ) → ℙ (i ∙ μ ls) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
---   splitTree-l i ¬ℙ⟨i⟩ ls m rs ℙ⟨i∙ls⟩ with splitDigit i ¬ℙ⟨i⟩ ls ℙ⟨i∙ls⟩
---   ... | lsₗ ∷⟨ mₗ ⟩∷ rsₗ [ p₁ , p₂ ] ↦ p₃ with listToTree lsₗ | deepₗ rsₗ m rs
---   ... | ls′ ↦ ls′≈ | rs′ ↦ rs′≈ = ls′ ∷⟨ mₗ ⟩∷ rs′ [ p₁ ∘′ ℙ-resp (∙≫ ls′≈) , ℙ-resp (∙≫ ≪∙ sym ls′≈) p₂ ] ↦ lemma
---     where
---     lemma =
---       begin
---         i ∙ (μ ls′ ∙ (μ mₗ ∙ μ rs′))
---       ≈⟨ ∙≫ ≪∙ ls′≈ ⟩
---         i ∙ (μ lsₗ ∙ (μ mₗ ∙ μ rs′))
---       ≈⟨ ∙≫ ∙≫ ∙≫ rs′≈  ⟩
---         i ∙ (μ lsₗ ∙ (μ mₗ ∙ (μ rsₗ ∙ (μ m ∙ μ rs))))
---       ≈⟨ ℳ ↯ ⟩
---         i ∙ (μ lsₗ ∙ (μ mₗ ∙ μ rsₗ)) ∙ (μ m ∙ μ rs)
---       ≈⟨ ≪∙ p₃ ⟩
---         i ∙ μ ls ∙ (μ m ∙ μ rs)
---       ≈⟨ ℳ ↯ ⟩
---         i ∙ (μ ls ∙ (μ m ∙ μ rs))
---       ∎
+  splitTree-l : ∀ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (rs : Digit Σ) → i ⟅ μ ls ⟆ → μ⟨ Split i (Tree Σ) Σ ⟩≈ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
+  splitTree-l i ls m rs s with splitDigit i ls s
+  splitTree-l i ls m rs s | lsₗ ∷⟨ mₗ ⟩∷ rsₗ [ p ] ⇑[ l≈ ] = [ ( ℳ ↯ ⍮′ ≪∙ l≈ ⍮ assoc _ _ _) ]≈ do
+    ls′ ← listToTree lsₗ [ i ∙> (sz <∙ _) ⟿ sz ]
+    rs′ ← deepₗ rsₗ m rs [ i ∙> (_ ∙> (_ ∙> sz)) ⟿ sz ]
+    pure (ls′ ∷⟨ mₗ ⟩∷ rs′ [ p ≈◄⟅ ∙≫ sym (_ ≈? _)  ⟆ ])
 
---   splitTree-r : ∀ i → ¬ ℙ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫)  → (rs : Digit Σ) → ℙ (i ∙ (μ ls ∙ (μ m ∙ μ rs))) → ∀ i′ → i′ ≈ i ∙(μ ls ∙ μ m) → ¬ ℙ (i ∙ (μ ls ∙ μ m)) → ⟨ Split i (Tree Σ) Σ ⟩μ⁻¹ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
+  splitTree-r : ∀ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (rs : Digit Σ) → ∀ i∙ls∙m → i∙ls∙m ≈  (i ∙ μ ls ∙ μ m) → (i ∙ μ ls ∙ μ m) ⟅ μ rs ⟆ → μ⟨ Split i (Tree Σ) Σ ⟩≈ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
+  splitTree-r i ls m rs i′ i′≈ s with splitDigit i′ rs (s ≈◄⟅ sym i′≈ ⟆)
+  splitTree-r i ls m rs i′ i′≈ s | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p ] ⇑[ r≈ ] = [  i ∙ (μ ls ∙ (μ m ∙ μ lsᵣ) ∙ (μ mᵣ ∙ μ rsᵣ)) ↣⟨ ℳ ↯ ⟩↣ (i ∙ μ ls ∙ μ m ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ)))  ⍮′ ≪∙ sym i′≈ ⍮ r≈ ⍮ i′≈ <∙ μ rs ⍮ ℳ ↯ ]≈ do
+    ls′ ← arg-syntax (λ sz → i ∙> (sz <∙ _)) (deepᵣ ls m lsᵣ)
+    rs′ ← arg-syntax (λ sz → i ∙> (_ ∙> (_ ∙> sz))) (listToTree rsᵣ)
+    pure (ls′ ∷⟨ mᵣ ⟩∷ rs′ [ p ≈◄⟅ ≪∙ i′≈ ⍮ ℳ ↯ ⍮′ ∙≫ sym (μ ls′ ≈? (μ ls ∙ (μ m ∙ μ lsᵣ))) ⟆ ])
 --   splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ with splitDigit i′ (¬ℙ⟨i∙ls∙m⟩ ∘′ ℙ-resp ⟪i′⟫) rs (ℙ-resp (ℳ ↯ ⍮′ ≪∙ sym ⟪i′⟫) ℙ⟨xs⟩)
 --   splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p₁ , p₂ ] ↦ p₃ with deepᵣ ls m lsᵣ | listToTree rsᵣ
 --   splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p₁ , p₂ ] ↦ p₃ | ls′ ↦ ls′≈ | rs′ ↦ rs′≈ = ls′ ∷⟨ mᵣ ⟩∷ rs′ [ p₁ ∘′ ℙ-resp lemma₁ , ℙ-resp lemma₂ p₂ ] ↦ lemma₃
@@ -200,15 +192,15 @@ splitTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄
 splitTree i empty s = ⊥-elim (¬∄ℙ s)
 splitTree i (single x) s = empty ∷⟨ x ⟩∷ empty [ s ≈◄⟅ ℳ ↯ ⟆ ] ⇑[ ℳ ↯ ]
 splitTree i (deep (𝓂 ↤ ls & m & rs ⇑[ 𝓂≈ ])) s with ⟪ℙ?⟫ (i ∙ μ ls)
-... | yes p₁ ≈ℙ i∙ls [ i∙ls≈ ] = {!!}
+... | yes p₁ ≈ℙ i∙ls [ i∙ls≈ ] = splitTree-l i ls m rs (¬ℙ s ∣ p₁) ≈[ ∙≫ 𝓂≈ ]
 ... | no ¬p₁ ≈ℙ i∙ls [ i∙ls≈ ] with ⟪ℙ?⟫ (i∙ls ∙ μ m)
-... | no ¬p₂ ≈ℙ i∙ls∙m [ i∙ls∙m≈ ] = {!!}
+... | no ¬p₂ ≈ℙ i∙ls∙m [ i∙ls∙m≈ ] = splitTree-r i ls m rs i∙ls∙m (i∙ls∙m≈ ⍮ ≪∙ i∙ls≈) (s ≈▻⟅ sym 𝓂≈ ⟆ ◄ ¬p₁ ≈◄⟅ sym i∙ls≈ ⟆ ◄ ¬p₂ ≈◄⟅ ≪∙ i∙ls≈ ⟆) ≈[ ∙≫ 𝓂≈ ]
 ... | yes p₂ ≈ℙ i∙ls∙m [ i∙ls∙m≈ ] with splitTree i∙ls m (s ≈▻⟅ sym 𝓂≈ ⟆ ◄ ¬p₁ ≈◄⟅ sym i∙ls≈ ⟆ ▻ p₂)
 ... | lsₘ ∷⟨ μmₘ ↤ mₘ ⇑[ mₘ≈ ] ⟩∷ rsₘ [ sₘ ] ⇑[ m≈ ] with splitNode (i∙ls ∙ μ lsₘ) mₘ (sₘ ≈▻⟅ sym mₘ≈ ⟆)
-... | lsₗ ∷⟨ mₗ ⟩∷ rsₗ [ sₗ ] ⇑[ l≈ ] = [ lemma ]≈ (do
+... | lsₗ ∷⟨ mₗ ⟩∷ rsₗ [ sₗ ] ⇑[ l≈ ] = [ lemma ]≈ do
       ll ← deepᵣ ls lsₘ lsₗ [ i ∙> (sz <∙ _) ⟿ sz ]
       rr ← deepₗ rsₗ rsₘ rs [ i ∙> (_ ∙> (μ mₗ ∙> sz)) ⟿ sz ]
-      pure (ll ∷⟨ mₗ ⟩∷ rr [ sₗ ≈◄⟅ ≪∙ ≪∙ i∙ls≈ ⍮ ℳ ↯ ⍮′ ∙≫ sym (_ ≈? _) ⟆ ]))
+      pure (ll ∷⟨ mₗ ⟩∷ rr [ sₗ ≈◄⟅ ≪∙ ≪∙ i∙ls≈ ⍮ ℳ ↯ ⍮′ ∙≫ sym (_ ≈? _) ⟆ ])
   where
   lemma = begin-equality
     i ∙ (μ ls ∙ (μ lsₘ ∙ μ lsₗ) ∙ (μ mₗ ∙ (μ rsₗ ∙ (μ rsₘ ∙ μ rs))))
