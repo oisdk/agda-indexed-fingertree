@@ -127,7 +127,6 @@ module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
   splitDigit : ∀ i → (xs : Digit Σ) → i ⟅ μ xs ⟆ → μ⟨ Split i (List Σ) Σ ⟩≈ (i ∙ μ xs)
   splitDigit i xs s = digitToList xs [ _ ∙> sz ⟿ sz ] >>= λ ys → splitList i ys (s ≈▻⟅ sym (_ ≈? _) ⟆)
 
-
   splitTree-l : ∀ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (rs : Digit Σ) → i ⟅ μ ls ⟆ → μ⟨ Split i (Tree Σ) Σ ⟩≈ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
   splitTree-l i ls m rs s with splitDigit i ls s
   splitTree-l i ls m rs s | lsₗ ∷⟨ mₗ ⟩∷ rsₗ [ p ] ⇑[ l≈ ] = [ ( ℳ ↯ ⍮′ ≪∙ l≈ ⍮ assoc _ _ _) ]≈ do
@@ -137,52 +136,23 @@ module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
 
   splitTree-r : ∀ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (rs : Digit Σ) → ∀ i∙ls∙m → i∙ls∙m ≈  (i ∙ μ ls ∙ μ m) → (i ∙ μ ls ∙ μ m) ⟅ μ rs ⟆ → μ⟨ Split i (Tree Σ) Σ ⟩≈ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
   splitTree-r i ls m rs i′ i′≈ s with splitDigit i′ rs (s ≈◄⟅ sym i′≈ ⟆)
-  splitTree-r i ls m rs i′ i′≈ s | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p ] ⇑[ r≈ ] = [  i ∙ (μ ls ∙ (μ m ∙ μ lsᵣ) ∙ (μ mᵣ ∙ μ rsᵣ)) ↣⟨ ℳ ↯ ⟩↣ (i ∙ μ ls ∙ μ m ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ)))  ⍮′ ≪∙ sym i′≈ ⍮ r≈ ⍮ i′≈ <∙ μ rs ⍮ ℳ ↯ ]≈ do
-    ls′ ← arg-syntax (λ sz → i ∙> (sz <∙ _)) (deepᵣ ls m lsᵣ)
-    rs′ ← arg-syntax (λ sz → i ∙> (_ ∙> (_ ∙> sz))) (listToTree rsᵣ)
-    pure (ls′ ∷⟨ mᵣ ⟩∷ rs′ [ p ≈◄⟅ ≪∙ i′≈ ⍮ ℳ ↯ ⍮′ ∙≫ sym (μ ls′ ≈? (μ ls ∙ (μ m ∙ μ lsᵣ))) ⟆ ])
---   splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ with splitDigit i′ (¬ℙ⟨i∙ls∙m⟩ ∘′ ℙ-resp ⟪i′⟫) rs (ℙ-resp (ℳ ↯ ⍮′ ≪∙ sym ⟪i′⟫) ℙ⟨xs⟩)
---   splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p₁ , p₂ ] ↦ p₃ with deepᵣ ls m lsᵣ | listToTree rsᵣ
---   splitTree-r i ¬ℙ⟨i⟩ ls m rs ℙ⟨xs⟩ i′ ⟪i′⟫ ¬ℙ⟨i∙ls∙m⟩ | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p₁ , p₂ ] ↦ p₃ | ls′ ↦ ls′≈ | rs′ ↦ rs′≈ = ls′ ∷⟨ mᵣ ⟩∷ rs′ [ p₁ ∘′ ℙ-resp lemma₁ , ℙ-resp lemma₂ p₂ ] ↦ lemma₃
---     where
---     lemma₁ =
---       begin
---         i ∙ μ ls′
---       ≈⟨ ∙≫ ls′≈ ⟩
---         i ∙ (μ ls ∙ (μ m ∙ μ lsᵣ))
---       ≈⟨ ℳ ↯ ⟩
---         (i ∙ (μ ls ∙ μ m)) ∙ μ lsᵣ
---       ≈˘⟨ ≪∙ ⟪i′⟫ ⟩
---         i′ ∙ μ lsᵣ
---       ∎
---     lemma₂ =
---       begin
---         i′ ∙ (μ lsᵣ ∙ μ mᵣ)
---       ≈⟨ ≪∙ ⟪i′⟫ ⟩
---         (i ∙ (μ ls ∙ μ m)) ∙ (μ lsᵣ ∙ μ mᵣ)
---       ≈⟨ ℳ ↯ ⟩
---         i ∙ ((μ ls ∙ (μ m ∙ μ lsᵣ)) ∙ μ mᵣ)
---       ≈˘⟨ ∙≫ ≪∙ ls′≈ ⟩
---         i ∙ (μ ls′ ∙ μ mᵣ)
---       ∎
---     lemma₃ =
---       begin
---         i ∙ (μ ls′ ∙ (μ mᵣ ∙ μ rs′))
---       ≈⟨ ∙≫ ∙-cong ls′≈ (∙≫ rs′≈) ⟩
---         i ∙ ((μ ls ∙ (μ m ∙ μ lsᵣ)) ∙ (μ mᵣ ∙ μ rsᵣ))
---       ≈⟨ ℳ ↯ ⟩
---         (i ∙ (μ ls ∙ μ m)) ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ))
---       ≈˘⟨ ≪∙ ⟪i′⟫ ⟩
---         i′ ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ))
---       ≈⟨ p₃ ⟩
---         i′ ∙ μ rs
---       ≈⟨ ≪∙ ⟪i′⟫ ⟩
---         (i ∙ (μ ls ∙ μ m)) ∙ μ rs
---       ≈⟨ ℳ ↯ ⟩
---         i ∙ (μ ls ∙ (μ m ∙ μ rs))
---       ∎
-
-
+  splitTree-r i ls m rs i′ i′≈ s | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p ] ⇑[ r≈ ] = [ lemma ]≈ do
+      ls′ ← deepᵣ ls m lsᵣ [ i ∙> (sz <∙ _) ⟿ sz ]
+      rs′ ← listToTree rsᵣ [ i ∙> (_ ∙> (_ ∙> sz)) ⟿ sz ]
+      pure (ls′ ∷⟨ mᵣ ⟩∷ rs′ [ p ≈◄⟅ ≪∙ i′≈ ⍮ ℳ ↯ ⍮′ ∙≫ sym (μ ls′ ≈? (μ ls ∙ (μ m ∙ μ lsᵣ))) ⟆ ])
+    where
+    lemma = begin-equality
+      i ∙ (μ ls ∙ (μ m ∙ μ lsᵣ) ∙ (μ mᵣ ∙ μ rsᵣ))
+        ≈⟨ ℳ ↯ ⟩
+      i ∙ μ ls ∙ μ m ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ))
+        ≈⟨ ≪∙ sym i′≈ ⟩
+      i′ ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ))
+        ≈⟨ r≈ ⟩
+      i′ ∙ μ rs
+        ≈⟨ ≪∙ i′≈ ⟩
+      i ∙ μ ls ∙ μ m ∙ μ rs
+        ≈⟨ ℳ ↯ ⟩
+      i ∙ (μ ls ∙ (μ m ∙ μ rs)) ∎
 
 splitTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄
           → ∀ i
