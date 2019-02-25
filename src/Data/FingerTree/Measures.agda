@@ -39,13 +39,18 @@ open μ⟨_⟩≈_ public
 pure : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ (𝓢 : Σ) → μ⟨ Σ ⟩≈ μ 𝓢
 𝓢 (pure x) = x
 𝒻 (pure x) = refl
+{-# INLINE pure #-}
 
-infixl 2 _≈[_] ≈-rev _≈˘[_]
+infixl 2 _≈[_] ≈-rev
 _≈[_] : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ {x : 𝓡} → μ⟨ Σ ⟩≈ x → ∀ {y} → x ≈ y → μ⟨ Σ ⟩≈ y
-x ⇑[ x≈y ] ≈[ y≈z ] = x ⇑[ trans x≈y y≈z ]
+𝓢 (xs ≈[ y≈z ]) = 𝓢 xs
+𝒻 (xs ≈[ y≈z ]) = trans (𝒻 xs) y≈z
+{-# INLINE _≈[_] #-}
 
 ≈-rev : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ {x : 𝓡} → ∀ {y} → x ≈ y → μ⟨ Σ ⟩≈ x → μ⟨ Σ ⟩≈ y
-≈-rev y≈z (x ⇑[ x≈y ]) = x ⇑[ trans x≈y y≈z ]
+𝓢 (≈-rev y≈z xs) = 𝓢 xs
+𝒻 (≈-rev y≈z xs) = trans (𝒻 xs) y≈z
+{-# INLINE ≈-rev #-}
 
 syntax ≈-rev y≈z x↦y = x↦y ≈[ y≈z ]′
 
@@ -54,9 +59,6 @@ infixr 2 ≈-right
 ≈-right (x ⇑[ x≈y ]) y≈z = x ⇑[ trans x≈y y≈z ]
 
 syntax ≈-right x x≈ = [ x≈ ]≈ x
-
-_≈˘[_] : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ {x : 𝓡} → μ⟨ Σ ⟩≈ x → ∀ {y} → y ≈ x → μ⟨ Σ ⟩≈ y
-x ⇑[ x≈y ] ≈˘[ z≈y ] = x ⇑[ trans x≈y (sym z≈y) ]
 
 infixr 1 _↤_
 -- A memoized application of μ
@@ -78,23 +80,12 @@ instance
 
 open import Algebra.FunctionProperties _≈_
 
--- map-size : {f : 𝓡 → 𝓡}
---          → Congruent₁ f
---          → ∀ {a b} {Σ₁ : Set a} {Σ₂ : Set b} ⦃ _ : σ Σ₁ ⦄ ⦃ _ : σ Σ₂ ⦄
---          → ((x : Σ₁) → μ⟨ Σ₂ ⟩≈ (f (μ x)))
---          → {𝓂 : 𝓡}
---          → μ⟨ Σ₁ ⟩≈ 𝓂
---          → μ⟨ Σ₂ ⟩≈ (f 𝓂)
--- map-size cng f (x ⇑[ x≈ ]) = f x ≈[ cng x≈ ]
-
--- syntax map-size (λ sz → e₁) fn xs = [ e₁ ⟿ sz ] fn <$> xs
-
 infixl 2 arg-syntax
 record Arg {a} (Σ : Set a) ⦃ _ : σ Σ ⦄ (𝓂 : 𝓡) (f : 𝓡 → 𝓡) : Set (m ⊔ r ⊔ a) where
   constructor arg-syntax
   field
     ⟨f⟩ : Congruent₁ f
-    xs : μ⟨ Σ ⟩≈ 𝓂
+    arg : μ⟨ Σ ⟩≈ 𝓂
 open Arg
 
 syntax arg-syntax (λ sz → e₁) xs = xs [ e₁ ⟿ sz ]
@@ -104,19 +95,8 @@ _>>=_ : ∀ {a b} {Σ₁ : Set a} {Σ₂ : Set b} ⦃ _ : σ Σ₁ ⦄ ⦃ _ : �
       → Arg Σ₁ 𝓂 f
       → ((x : Σ₁) → ⦃ x≈ : μ x ≈ 𝓂 ⦄ → μ⟨ Σ₂ ⟩≈ f (μ x))
       → μ⟨ Σ₂ ⟩≈ f 𝓂
-arg-syntax cng (x ⇑[ x≈ ]) >>= k = k x ⦃ x≈ ⦄ ≈[ cng x≈ ]
+xs >>= k = k (𝓢 (arg xs)) ⦃ 𝒻 (arg xs) ⦄ ≈[ ⟨f⟩ xs (𝒻 (arg xs)) ]
+{-# INLINE _>>=_ #-}
 
 _≈?_ : ∀ x y → ⦃ x≈y : x ≈ y ⦄ → x ≈ y
 _≈?_ _ _ ⦃ x≈y ⦄ = x≈y
-
--- infixl 2 cont-size
--- cont-size : {f : 𝓡 → 𝓡}
---           → Congruent₁ f
---           → ∀ {a b} {σ₁ : set a} {σ₂ : set b} ⦃ _ : σ σ₁ ⦄ ⦃ _ : σ σ₂ ⦄
---           → {𝓂 : 𝓡}
---           → μ⟨ Σ₁ ⟩≈ 𝓂
---           → ((x : Σ₁) → {x≈ : μ x ≈ 𝓂 } → μ⟨ Σ₂ ⟩≈ (f (μ x)))
---           → μ⟨ Σ₂ ⟩≈ (f 𝓂)
--- cont-size cng (x ⇑[ x≈ ]) f = f x {x≈} ≈[ cng x≈ ]
-
--- syntax cont-size (λ sz → e₁) xs e₂ = xs [ e₁ ⟿ sz ] e₂

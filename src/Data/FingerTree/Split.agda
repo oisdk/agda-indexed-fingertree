@@ -11,7 +11,6 @@ module Data.FingerTree.Split
   {ℙ : Pred (Monoid.Carrier ℳ) s}
   (ℙ-resp : ℙ Respects (Monoid._≈_ ℳ))
   (ℙ? : Decidable ℙ)
-  (mono-ℙ : ∀ {x y} → ℙ x → ℙ (Monoid._∙_ ℳ x y))
   where
 
 open import Relation.Nullary using (¬_; yes; no; Dec)
@@ -32,8 +31,7 @@ open σ ⦃ ... ⦄
 
 open Monoid ℳ renaming (Carrier to 𝓡)
 
-import Relation.Binary.Construct.FromPred setoid ℙ as PredRel
-open import Relation.Binary.Reasoning.FasterInference.Preorder (PredRel.preorder ℙ-resp)
+open import Relation.Binary.Reasoning.FasterInference.Setoid setoid
 
 infixl 5 _⟅_⟆
 record _⟅_⟆ (left focus : 𝓡) : Set s where
@@ -66,22 +64,20 @@ _≈⟅_∣_⟆ : ∀ {x₁ y₁ x₂ y₂} → x₁ ⟅ y₁ ⟆ → x₁ ≈ x
 ¬∄ℙ : ∀ {i} → ¬ i ⟅ ε ⟆
 ¬∄ℙ (¬ℙ ∣ !ℙ) = ¬ℙ (ℙ-resp (identityʳ _) !ℙ)
 
-record Split (i : 𝓡) {a b} (Σ : Set a) (A : Set b) ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ : Set (a ⊔ b ⊔ s) where
+record Split′ (i : 𝓡) {a b} (Σ : Set a) (A : Set b) ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ : Set (a ⊔ b ⊔ s) where
   constructor _∷⟨_⟩∷_[_]
   field
-    left  : Σ
-    focus : A
-    right : Σ
-    proof : i ∙ μ left ⟅ μ focus ⟆
-open Split
-
+    left′  : Σ
+    focus′ : A
+    right′ : Σ
+    proof′ : i ∙ μ left′ ⟅ μ focus′ ⟆
 
 instance
-  σ-Split : ∀  {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ {i : 𝓡} → σ (Split i Σ A)
-  μ ⦃ σ-Split {i = i} ⦄ (l ∷⟨ x ⟩∷ r [ _ ]) = i ∙ (μ l ∙ (μ x ∙ μ r))
+  σ-Split′ : ∀  {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ {i : 𝓡} → σ (Split′ i Σ A)
+  μ ⦃ σ-Split′ {i = i} ⦄ (l ∷⟨ x ⟩∷ r [ _ ]) = i ∙ (μ l ∙ (μ x ∙ μ r))
 
 infixl 2 _i≈[_]
-_i≈[_] : ∀ {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ → ∀ {i xs} → μ⟨ Split i Σ A ⟩≈ (i ∙ xs) → ∀ {j} → i ≈ j → μ⟨ Split j Σ A ⟩≈ (j ∙ xs)
+_i≈[_] : ∀ {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ → ∀ {i xs} → μ⟨ Split′ i Σ A ⟩≈ (i ∙ xs) → ∀ {j} → i ≈ j → μ⟨ Split′ j Σ A ⟩≈ (j ∙ xs)
 xs ∷⟨ x ⟩∷ ys [ p₁ ] ⇑[ p₂ ] i≈[ i≈ ] = xs ∷⟨ x ⟩∷ ys [ p₁ ≈◄⟅ ≪∙ i≈ ⟆ ] ⇑[ ≪∙ sym i≈ ⍮ p₂ ⍮ ≪∙ i≈ ]
 
 open import Data.Empty using (⊥-elim)
@@ -101,7 +97,7 @@ stored (⟪ℙ?⟫ x) = x
 equiv  (⟪ℙ?⟫ x) = refl
 
 module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
-  splitList : (i : 𝓡) → (xs : List Σ) → i ⟅ μ xs ⟆ → μ⟨ Split i (List Σ) Σ ⟩≈ (i ∙ μ xs)
+  splitList : (i : 𝓡) → (xs : List Σ) → i ⟅ μ xs ⟆ → μ⟨ Split′ i (List Σ) Σ ⟩≈ (i ∙ μ xs)
   splitList i [] s = ⊥-elim (¬∄ℙ s)
   splitList i (x ∷ xs) s with ⟪ℙ?⟫ (i ∙ μ x)
   ... | yes p ≈ℙ i∙x [ i∙x≈ ] = [] ∷⟨ x ⟩∷ xs [ s ▻ p ≈◄⟅ ℳ ↯ ⟆  ] ⇑[ ℳ ↯ ]
@@ -118,30 +114,30 @@ module _ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ where
   digitToList (D₃ x₁ x₂ x₃) = x₁ ∷ x₂ ∷ x₃ ∷ [] ⇑[ ℳ ↯ ]
   digitToList (D₄ x₁ x₂ x₃ x₄) = x₁ ∷ x₂ ∷ x₃ ∷ x₄ ∷ [] ⇑[ ℳ ↯ ]
 
-  splitNode : ∀ i → (xs : Node Σ) → i ⟅ μ xs ⟆ → μ⟨ Split i (List Σ) Σ ⟩≈ (i ∙ μ xs)
+  splitNode : ∀ i → (xs : Node Σ) → i ⟅ μ xs ⟆ → μ⟨ Split′ i (List Σ) Σ ⟩≈ (i ∙ μ xs)
   splitNode i xs s = do
     ys ← nodeToList xs [ _ ∙> sz ⟿ sz ]
     splitList i ys (s ≈▻⟅ sym (_ ≈? _) ⟆)
 
 
-  splitDigit : ∀ i → (xs : Digit Σ) → i ⟅ μ xs ⟆ → μ⟨ Split i (List Σ) Σ ⟩≈ (i ∙ μ xs)
+  splitDigit : ∀ i → (xs : Digit Σ) → i ⟅ μ xs ⟆ → μ⟨ Split′ i (List Σ) Σ ⟩≈ (i ∙ μ xs)
   splitDigit i xs s = digitToList xs [ _ ∙> sz ⟿ sz ] >>= λ ys → splitList i ys (s ≈▻⟅ sym (_ ≈? _) ⟆)
 
-  splitTree-l : ∀ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (rs : Digit Σ) → i ⟅ μ ls ⟆ → μ⟨ Split i (Tree Σ) Σ ⟩≈ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
+  splitTree-l : ∀ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (rs : Digit Σ) → i ⟅ μ ls ⟆ → μ⟨ Split′ i (Tree Σ) Σ ⟩≈ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
   splitTree-l i ls m rs s with splitDigit i ls s
   splitTree-l i ls m rs s | lsₗ ∷⟨ mₗ ⟩∷ rsₗ [ p ] ⇑[ l≈ ] = [ ( ℳ ↯ ⍮′ ≪∙ l≈ ⍮ assoc _ _ _) ]≈ do
     ls′ ← listToTree lsₗ [ i ∙> (sz <∙ _) ⟿ sz ]
     rs′ ← deepₗ rsₗ m rs [ i ∙> (_ ∙> (_ ∙> sz)) ⟿ sz ]
     pure (ls′ ∷⟨ mₗ ⟩∷ rs′ [ p ≈◄⟅ ∙≫ sym (_ ≈? _)  ⟆ ])
 
-  splitTree-r : ∀ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (rs : Digit Σ) → ∀ i∙ls∙m → i∙ls∙m ≈  (i ∙ μ ls ∙ μ m) → (i ∙ μ ls ∙ μ m) ⟅ μ rs ⟆ → μ⟨ Split i (Tree Σ) Σ ⟩≈ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
+  splitTree-r : ∀ i → (ls : Digit Σ) → (m : Tree ⟪ Node Σ ⟫) → (rs : Digit Σ) → ∀ i∙ls∙m → i∙ls∙m ≈  (i ∙ μ ls ∙ μ m) → (i ∙ μ ls ∙ μ m) ⟅ μ rs ⟆ → μ⟨ Split′ i (Tree Σ) Σ ⟩≈ (i ∙ (μ ls ∙ (μ m ∙ μ rs)))
   splitTree-r i ls m rs i′ i′≈ s with splitDigit i′ rs (s ≈◄⟅ sym i′≈ ⟆)
   splitTree-r i ls m rs i′ i′≈ s | lsᵣ ∷⟨ mᵣ ⟩∷ rsᵣ [ p ] ⇑[ r≈ ] = [ lemma ]≈ do
       ls′ ← deepᵣ ls m lsᵣ [ i ∙> (sz <∙ _) ⟿ sz ]
       rs′ ← listToTree rsᵣ [ i ∙> (_ ∙> (_ ∙> sz)) ⟿ sz ]
       pure (ls′ ∷⟨ mᵣ ⟩∷ rs′ [ p ≈◄⟅ ≪∙ i′≈ ⍮ ℳ ↯ ⍮′ ∙≫ sym (μ ls′ ≈? (μ ls ∙ (μ m ∙ μ lsᵣ))) ⟆ ])
     where
-    lemma = begin-equality
+    lemma = begin
       i ∙ (μ ls ∙ (μ m ∙ μ lsᵣ) ∙ (μ mᵣ ∙ μ rsᵣ))
         ≈⟨ ℳ ↯ ⟩
       i ∙ μ ls ∙ μ m ∙ (μ lsᵣ ∙ (μ mᵣ ∙ μ rsᵣ))
@@ -158,7 +154,7 @@ splitTree : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄
           → ∀ i
           → (xs : Tree Σ)
           → i ⟅ μ xs ⟆
-          → μ⟨ Split i (Tree Σ) Σ ⟩≈ (i ∙ μ xs)
+          → μ⟨ Split′ i (Tree Σ) Σ ⟩≈ (i ∙ μ xs)
 splitTree i empty s = ⊥-elim (¬∄ℙ s)
 splitTree i (single x) s = empty ∷⟨ x ⟩∷ empty [ s ≈◄⟅ ℳ ↯ ⟆ ] ⇑[ ℳ ↯ ]
 splitTree i (deep (𝓂 ↤ ls & m & rs ⇑[ 𝓂≈ ])) s with ⟪ℙ?⟫ (i ∙ μ ls)
@@ -172,7 +168,7 @@ splitTree i (deep (𝓂 ↤ ls & m & rs ⇑[ 𝓂≈ ])) s with ⟪ℙ?⟫ (i �
       rr ← deepₗ rsₗ rsₘ rs [ i ∙> (_ ∙> (μ mₗ ∙> sz)) ⟿ sz ]
       pure (ll ∷⟨ mₗ ⟩∷ rr [ sₗ ≈◄⟅ ≪∙ ≪∙ i∙ls≈ ⍮ ℳ ↯ ⍮′ ∙≫ sym (_ ≈? _) ⟆ ])
   where
-  lemma = begin-equality
+  lemma = begin
     i ∙ (μ ls ∙ (μ lsₘ ∙ μ lsₗ) ∙ (μ mₗ ∙ (μ rsₗ ∙ (μ rsₘ ∙ μ rs))))
       ≈⟨ ℳ ↯ ⟩
     i ∙ μ ls ∙ μ lsₘ ∙ (μ lsₗ ∙ (μ mₗ ∙ μ rsₗ)) ∙ (μ rsₘ ∙ μ rs)
@@ -191,6 +187,19 @@ splitTree i (deep (𝓂 ↤ ls & m & rs ⇑[ 𝓂≈ ])) s with ⟪ℙ?⟫ (i �
       ≈⟨ ∙≫ 𝓂≈ ⟩
     i ∙ 𝓂 ∎
 
+record Split {a} (Σ : Set a) ⦃ _ : σ Σ ⦄ : Set (a ⊔ r ⊔ m ⊔ s) where
+  constructor _∷⟨_⟩∷_[_]
+  field
+    left : Tree Σ
+    focus : Σ
+    right : Tree Σ
+    is-split : μ left ⟅ μ focus ⟆
+open Split public
+
+instance
+  σ-Split : ∀  {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → σ (Split Σ)
+  μ ⦃ σ-Split ⦄ (l ∷⟨ x ⟩∷ r [ _ ]) = μ l ∙ (μ x ∙ μ r)
+
 open import Relation.Nullary using (Dec; yes; no)
 open import Relation.Nullary.Decidable using (True; toWitness; False; toWitnessFalse)
 
@@ -198,5 +207,6 @@ split : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄
       → {¬ℙ⟨ε⟩ : False (ℙ? ε)}
       → (xs : Tree Σ)
       → {ℙ⟨xs⟩ : True (ℙ? (μ xs))}
-      → μ⟨ Split ε (Tree Σ) Σ ⟩≈ μ xs
-split {¬ℙ⟨ε⟩ = ¬ℙ⟨ε⟩} xs {ℙ⟨xs⟩} = splitTree ε xs (toWitnessFalse ¬ℙ⟨ε⟩ ∣ ℙ-resp (sym (identityˡ _)) (toWitness ℙ⟨xs⟩)) ≈[ identityˡ _ ]
+      → μ⟨ Split Σ ⟩≈ μ xs
+split {¬ℙ⟨ε⟩ = ¬ℙ⟨ε⟩} xs {ℙ⟨xs⟩} with splitTree ε xs (toWitnessFalse ¬ℙ⟨ε⟩ ∣ ℙ-resp (sym (identityˡ _)) (toWitness ℙ⟨xs⟩)) ≈[ identityˡ _ ]
+... | xs′ ∷⟨ x ⟩∷ ys [ p ] ⇑[ p₂ ] = xs′ ∷⟨ x ⟩∷ ys [ p ≈◄⟅ identityˡ _ ⟆ ] ⇑[  sym (identityˡ _) ⍮ p₂ ]
