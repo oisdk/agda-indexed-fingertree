@@ -1,6 +1,6 @@
 open import Relation.Binary
 
-module Relation.Binary.Reasoning.FasterInference.Setoid {ℓ₁ ℓ₂} (setoid : Setoid ℓ₁ ℓ₂) where
+module Data.FingerTree.Relation.Binary.Reasoning.FasterInference.Setoid {ℓ₁ ℓ₂} (setoid : Setoid ℓ₁ ℓ₂) where
 
 open import Relation.Binary.PropositionalEquality as ≡ using (_≡_)
 

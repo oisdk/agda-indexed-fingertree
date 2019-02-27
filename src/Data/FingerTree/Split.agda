@@ -34,7 +34,7 @@ open σ ⦃ ... ⦄
 
 open Monoid ℳ renaming (Carrier to 𝓡)
 
-open import Relation.Binary.Reasoning.FasterInference.Setoid setoid
+open import Data.FingerTree.Relation.Binary.Reasoning.FasterInference.Setoid setoid
 
 infixr 5 _∣_
 record _∣_ (left focus : 𝓡) : Set s where
@@ -82,7 +82,11 @@ module SplitStructures where
     μ ⦃ σ-Split′ {i = i} ⦄ (l ∷⟨ x ⟩∷ r [ _ ]) = i ∙ (μ l ∙ (μ x ∙ μ r))
 
   infixl 2 _i≈[_]
-  _i≈[_] : ∀ {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ → ∀ {i xs} → μ⟨ Split′ i Σ A ⟩≈ (i ∙ xs) → ∀ {j} → i ≈ j → μ⟨ Split′ j Σ A ⟩≈ (j ∙ xs)
+  _i≈[_] : ∀ {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄
+         → ∀ {i xs}
+         → μ⟨ Split′ i Σ A ⟩≈ (i ∙ xs)
+         → ∀ {j}
+         → i ≈ j → μ⟨ Split′ j Σ A ⟩≈ (j ∙ xs)
   xs ∷⟨ x ⟩∷ ys [ p₁ ] ⇑[ p₂ ] i≈[ i≈ ] = xs ∷⟨ x ⟩∷ ys [ p₁ ≈◄⟅ ≪∙ i≈ ⟆ ] ⇑[ ≪∙ sym i≈ ⍮ p₂ ⍮ ≪∙ i≈ ]
   {-# INLINE _i≈[_] #-}
 
