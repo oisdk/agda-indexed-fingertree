@@ -85,7 +85,7 @@ digitToTree (D₂ x₁ x₂) = deep ⟪ D₁ x₁ & empty & D₁ x₂ ⇓⟫ ⇑
 digitToTree (D₃ x₁ x₂ x₃) = deep ⟪ D₂ x₁ x₂ & empty & D₁ x₃ ⇓⟫ ⇑[ μ (D₂ x₁ x₂) ∙ (ε ∙ μ x₃) ↢ ℳ ↯ ]
 digitToTree (D₄ x₁ x₂ x₃ x₄) = deep ⟪ D₂ x₁ x₂ & empty & D₂ x₃ x₄ ⇓⟫ ⇑[ μ (D₂ x₁ x₂) ∙ (ε ∙ μ (D₂ x₃ x₄)) ↢ ℳ ↯ ]
 
-open import Data.List as LIst using (List; _∷_; [])
+open import Data.List using (List; _∷_; [])
 
 nodeToList : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → (xs : Node Σ) → μ⟨ List Σ ⟩≈ (μ xs)
 nodeToList (N₂ x₁ x₂) = x₁ ∷ x₂ ∷ [] ⇑[ ℳ ↯ ]
