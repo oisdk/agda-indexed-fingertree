@@ -14,9 +14,6 @@ open import Data.FingerTree.Structures ℳ
 open import Data.FingerTree.Reasoning ℳ
 
 open σ ⦃ ... ⦄
-{-# DISPLAY σ.μ _ x = μ x #-}
-{-# DISPLAY μ-tree _ x = μ x #-}
-{-# DISPLAY μ-deep _ x = μ x #-}
 
 open Monoid ℳ renaming (Carrier to 𝓡)
 

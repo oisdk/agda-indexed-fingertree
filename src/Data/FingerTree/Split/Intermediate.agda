@@ -4,7 +4,7 @@ open import Algebra
 open import Relation.Unary
 open import Relation.Binary hiding (Decidable)
 
-module Data.FingerTree.Split
+module Data.FingerTree.Split.Intermediate
   {r m}
   (ℳ : Monoid r m)
   {s}
@@ -36,27 +36,26 @@ open import Data.FingerTree.Relation.Binary.Reasoning.FasterInference.Setoid set
 
 open import Data.FingerTree.Split.Point ℳ ℙ-resp ℙ?
 open import Data.FingerTree.Split.StoredPredicate ℳ ℙ-resp ℙ?
-open import Data.FingerTree.Split.Intermediate ℳ ℙ-resp ℙ?
-open import Data.FingerTree.Split.Structures ℳ ℙ-resp ℙ?
 
-record Split {a} (Σ : Set a) ⦃ _ : σ Σ ⦄ : Set (a ⊔ r ⊔ m ⊔ s) where
+open import Data.Empty.Irrelevant using (⊥-elim)
+
+record Split′ (i : 𝓡) {a b} (Σ : Set a) (A : Set b) ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ : Set (a ⊔ b ⊔ s) where
   constructor _∷⟨_⟩∷_[_]
   field
-    left : Tree Σ
-    focus : Σ
-    right : Tree Σ
-    is-split : μ left ∣ μ focus
-open Split public
-
+    left′  : Σ
+    focus′ : A
+    right′ : Σ
+    .proof′ : i ∙ μ left′ ∣ μ focus′
+open Split′ public
 instance
-  σ-Split : ∀  {a} {Σ : Set a} ⦃ _ : σ Σ ⦄ → σ (Split Σ)
-  μ ⦃ σ-Split ⦄ (l ∷⟨ x ⟩∷ r [ _ ]) = μ l ∙ (μ x ∙ μ r)
+  σ-Split′ : ∀  {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄ {i : 𝓡} → σ (Split′ i Σ A)
+  μ ⦃ σ-Split′ {i = i} ⦄ (l ∷⟨ x ⟩∷ r [ _ ]) = i ∙ (μ l ∙ (μ x ∙ μ r))
 
-
-split : ∀ {a} {Σ : Set a} ⦃ _ : σ Σ ⦄
-      → {¬ℙ⟨ε⟩ : False (ℙ? ε)}
-      → (xs : Tree Σ)
-      → {ℙ⟨xs⟩ : True (ℙ? (μ xs))}
-      → μ⟨ Split Σ ⟩≈ μ xs
-split {¬ℙ⟨ε⟩ = ¬ℙ⟨ε⟩} xs {ℙ⟨xs⟩} with splitTree ε xs (init-ℙ ¬ℙ⟨ε⟩ ℙ⟨xs⟩) ≈[ identityˡ _ ]
-... | xs′ ∷⟨ x ⟩∷ ys [ p ] ⇑[ p₂ ] = xs′ ∷⟨ x ⟩∷ ys [ Relation.Nullary.recompute (_ ∣? _) p ≈◄⟅ identityˡ _ ⟆ ] ⇑[  sym (identityˡ _) ⍮ p₂ ]
+infixl 2 _i≈[_]
+_i≈[_] : ∀ {a b} {Σ : Set a} {A : Set b} ⦃ _ : σ Σ ⦄ ⦃ _ : σ A ⦄
+          → ∀ {i xs}
+          → μ⟨ Split′ i Σ A ⟩≈ (i ∙ xs)
+          → ∀ {j}
+          → i ≈ j → μ⟨ Split′ j Σ A ⟩≈ (j ∙ xs)
+xs ∷⟨ x ⟩∷ ys [ p₁ ] ⇑[ p₂ ] i≈[ i≈ ] = xs ∷⟨ x ⟩∷ ys [ p₁ ≈◄⟅ ≪∙ i≈ ⟆ ] ⇑[ ≪∙ sym i≈ ⍮ p₂ ⍮ ≪∙ i≈ ]
+{-# INLINE _i≈[_] #-}
